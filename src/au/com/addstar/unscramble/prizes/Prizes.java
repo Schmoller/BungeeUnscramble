@@ -10,6 +10,8 @@ public class Prizes
 		
 		if(type.equals("money"))
 			return MoneyPrize.load(map);
+		else if(type.equals("item"))
+			return ItemPrize.load(map);
 		
 		return null;
 	}

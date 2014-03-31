@@ -2,7 +2,7 @@ package au.com.addstar.unscramble;
 
 import java.util.Arrays;
 
-import au.com.addstar.unscramble.prizes.MoneyPrize;
+import au.com.addstar.unscramble.prizes.ItemPrize;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -195,8 +195,7 @@ public class UnscrambleCommand extends Command
 			}
 		}
 		
-		// TODO: Hints, prizes
-		Unscramble.instance.newSession(word, time, hints, new MoneyPrize(100));
+		Unscramble.instance.newSession(word, time, hints, new ItemPrize("SMOOTH_BRICK", 3, 20));
 	}
 
 }
