@@ -1,7 +1,6 @@
 package au.com.addstar.unscramble;
 
 import java.io.File;
-import java.util.HashSet;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -19,7 +18,7 @@ public class Unscramble extends Plugin implements Listener
 	public static Random rand = new Random();
 	public static Unscramble instance;
 	
-	private HashSet<Session> mCurrentSessions = new HashSet<Session>();
+	private Session mCurrentSession = null;
 	private GameConfig mAutoGame;
 	
 	@Override
@@ -29,7 +28,7 @@ public class Unscramble extends Plugin implements Listener
 		
 		getDataFolder().mkdirs();
 		
-		getProxy().getPluginManager().registerCommand(this, new NewGameCommand());
+		getProxy().getPluginManager().registerCommand(this, new UnscrambleCommand());
 		getProxy().getPluginManager().registerListener(this, this);
 		
 		loadAutoGame();
@@ -64,28 +63,29 @@ public class Unscramble extends Plugin implements Listener
 		{
 			ProxiedPlayer player = (ProxiedPlayer)event.getSender();
 			
-			for(Session session : mCurrentSessions)
-			{
-				session.makeGuess(player, event.getMessage());
-			}
+			if(mCurrentSession != null)
+				mCurrentSession.makeGuess(player, event.getMessage());
 		}
 	}
 	
-	public void onSessionFinish(Session session)
+	public void onSessionFinish()
 	{
-		mCurrentSessions.remove(session);
+		mCurrentSession = null;
 	}
 	
 	public void newSession(String word, long length)
 	{
+		if(mCurrentSession != null)
+			throw new IllegalStateException("Session in progress");
+		
 		Session session = new Session(word, length);
 		session.start();
-		mCurrentSessions.add(session);
+		mCurrentSession = session;
 	}
 	
 	public void startAutoGame()
 	{
-		if(mAutoGame == null)
+		if(mAutoGame == null || mCurrentSession != null)
 			return;
 		
 		Session session = mAutoGame.newSession();
@@ -93,7 +93,17 @@ public class Unscramble extends Plugin implements Listener
 			return;
 		
 		session.start();
-		mCurrentSessions.add(session);
+		mCurrentSession = session;
+	}
+	
+	public Session getSession()
+	{
+		return mCurrentSession;
+	}
+	
+	public boolean isSessionRunning()
+	{
+		return mCurrentSession != null;
 	}
 	
 }

@@ -41,6 +41,16 @@ public class Session implements Runnable
 		BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "New Game! Unscramble " + ChatColor.ITALIC + "this: " + ChatColor.RED + mWordScramble));
 	}
 	
+	public void stop()
+	{
+		mTask.cancel();
+		mTask = null;
+		Unscramble.instance.onSessionFinish();
+		
+		BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Oh! Sorry, the game was cancelled."));
+		BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "The answer was... " + ChatColor.RED + mWord));
+	}
+	
 	public void doHint()
 	{
 		if(!mHint.contains("*"))
@@ -82,7 +92,7 @@ public class Session implements Runnable
 			mTask = null;
 			// TODO: Prizes
 			
-			Unscramble.instance.onSessionFinish(this);
+			Unscramble.instance.onSessionFinish();
 			
 		}
 		else
@@ -110,7 +120,7 @@ public class Session implements Runnable
 			mTask.cancel();
 			mTask = null;
 			
-			Unscramble.instance.onSessionFinish(this);
+			Unscramble.instance.onSessionFinish();
 			return;
 		}
 		
