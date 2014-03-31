@@ -40,9 +40,9 @@ public class Session implements Runnable
 	
 	public void start()
 	{
+		BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "New Game! Unscramble " + ChatColor.ITALIC + "this: " + ChatColor.RED + mWordScramble));
 		mTask = BungeeCord.getInstance().getScheduler().schedule(Unscramble.instance, this, 0, 1, TimeUnit.SECONDS);
 		mLastHint = System.currentTimeMillis();
-		BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "New Game! Unscramble " + ChatColor.ITALIC + "this: " + ChatColor.RED + mWordScramble));
 	}
 	
 	public void stop()
