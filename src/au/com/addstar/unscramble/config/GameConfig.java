@@ -23,6 +23,10 @@ public class GameConfig extends Config
 	@Comment("The length of the game in seconds")
 	public int length = 30;
 	
+	@Comment("The warning period (in seconds) given so people have time to get ready")
+	@Path("warning-period")
+	public int warningPeriod = 3;
+	
 	@Path("hint-interval")
 	@Comment("The time between each hint given in seconds. 0 will disable hints")
 	public int hintInterval = 12;

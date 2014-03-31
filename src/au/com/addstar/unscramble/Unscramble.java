@@ -46,7 +46,7 @@ public class Unscramble extends Plugin implements Listener
 		{
 			mAutoGame.init(new File(getDataFolder(), "auto.yml"));
 			
-			getProxy().getScheduler().schedule(this, new AutoGameStarter(), mAutoGame.interval, mAutoGame.interval, TimeUnit.MINUTES);
+			getProxy().getScheduler().schedule(this, new AutoGameStarter(mAutoGame.warningPeriod), mAutoGame.interval, mAutoGame.interval, TimeUnit.MINUTES);
 		}
 		catch(InvalidConfigurationException e)
 		{
