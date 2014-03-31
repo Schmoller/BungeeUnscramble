@@ -13,8 +13,7 @@ public class NewGameCommand extends Command
 	@Override
 	public void execute( CommandSender sender, String[] args )
 	{
-		Session session = new Session("test word", 30000);
-		session.start();
+		Unscramble.instance.newSession("test word", 90000);
 	}
 
 }

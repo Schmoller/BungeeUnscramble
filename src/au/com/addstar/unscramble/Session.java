@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 public class Session implements Runnable
@@ -62,6 +63,27 @@ public class Session implements Runnable
 		BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Hint!... " + mHint));
 	}
 	
+	public boolean isRunning()
+	{
+		return mTask != null;
+	}
+	
+	public void makeGuess(ProxiedPlayer player, String guess)
+	{
+		if(!isRunning())
+			return;
+		
+		if(mWord.equalsIgnoreCase(guess))
+		{
+			BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Congratulations " + ChatColor.stripColor(player.getDisplayName()) + "!"));
+			mTask.cancel();
+			mTask = null;
+			// TODO: Prizes
+			
+			Unscramble.instance.onSessionFinish(this);
+		}
+	}
+	
 	@Override
 	public void run()
 	{
@@ -73,6 +95,9 @@ public class Session implements Runnable
 			BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "The answer was... " + ChatColor.RED + mWord));
 
 			mTask.cancel();
+			mTask = null;
+			
+			Unscramble.instance.onSessionFinish(this);
 			return;
 		}
 		
