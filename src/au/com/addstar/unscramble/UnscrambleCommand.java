@@ -1,12 +1,15 @@
 package au.com.addstar.unscramble;
 
 import java.util.Arrays;
+import java.util.List;
 
 import au.com.addstar.unscramble.prizes.ItemPrize;
+import au.com.addstar.unscramble.prizes.Prize;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
 public class UnscrambleCommand extends Command
@@ -106,7 +109,26 @@ public class UnscrambleCommand extends Command
 	
 	private void commandClaim(CommandSender sender)
 	{
-		
+		if(sender instanceof ProxiedPlayer)
+		{
+			ProxiedPlayer player = (ProxiedPlayer)sender;
+			
+			List<Prize> prizes = Unscramble.instance.getPrizes(player, true);
+			if(prizes == null || prizes.isEmpty())
+			{
+				sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_RED + "No prizes found under your name."));
+				return;
+			}
+			
+			for(Prize prize : prizes)
+			{
+				sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "You have been awarded " + ChatColor.YELLOW + prize.getDescription()));
+				prize.award(player);
+				// TODO: we need to handle not being able to give prizes
+			}
+		}
+		else
+			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_RED + "No prizes found under your name."));
 	}
 	
 	private void commandReload(CommandSender sender)

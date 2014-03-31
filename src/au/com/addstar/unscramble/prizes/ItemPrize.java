@@ -3,6 +3,8 @@ package au.com.addstar.unscramble.prizes;
 import java.util.HashMap;
 import java.util.Map;
 
+import au.com.addstar.unscramble.MessageOutput;
+
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class ItemPrize extends Prize
@@ -28,6 +30,13 @@ public class ItemPrize extends Prize
 	@Override
 	public void award( ProxiedPlayer player )
 	{
+		new MessageOutput("Unscramble", "AwardItem")
+			.writeInt(0)
+			.writeUTF(player.getName())
+			.writeUTF(mMaterial)
+			.writeByte(mData)
+			.writeByte(mCount)
+			.send(player.getServer().getInfo());
 	}
 
 	@Override

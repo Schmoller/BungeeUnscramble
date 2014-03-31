@@ -1,7 +1,6 @@
 package au.com.addstar.unscramble;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -9,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import au.com.addstar.unscramble.config.GameConfig;
 import au.com.addstar.unscramble.config.UnclaimedPrizes;
 import au.com.addstar.unscramble.prizes.Prize;
+import au.com.addstar.unscramble.prizes.SavedPrize;
 
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -125,14 +125,7 @@ public class Unscramble extends Plugin implements Listener
 	
 	public void givePrize(ProxiedPlayer player, Prize prize)
 	{
-		List<Prize> prizes = mUnclaimed.prizes.get(player.getName());
-		if(prizes == null)
-		{
-			prizes = new ArrayList<Prize>();
-			mUnclaimed.prizes.put(player.getName(), prizes);
-		}
-		
-		prizes.add(prize);
+		mUnclaimed.prizes.add(new SavedPrize(player.getName(), prize));
 		
 		try
 		{
@@ -142,5 +135,24 @@ public class Unscramble extends Plugin implements Listener
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public List<Prize> getPrizes(ProxiedPlayer player, boolean remove)
+	{
+		if(remove)
+		{
+			List<Prize> prizes = mUnclaimed.getPrizes(player.getName(), true);
+			try
+			{
+				mUnclaimed.save();
+			}
+			catch(InvalidConfigurationException e)
+			{
+				e.printStackTrace();
+			}
+			return prizes;
+		}
+		else
+			return mUnclaimed.getPrizes(player.getName(), false);
 	}
 }
