@@ -24,6 +24,8 @@ public class Session implements Runnable
 	
 	private ScheduledTask mTask;
 	
+	private int mChatLines = 0;
+	
 	public Session(String word, long duration)
 	{
 		mWord = word;
@@ -81,7 +83,18 @@ public class Session implements Runnable
 			// TODO: Prizes
 			
 			Unscramble.instance.onSessionFinish(this);
+			
 		}
+		else
+		{
+			++mChatLines;
+			if(mChatLines > 10)
+			{
+				mChatLines = 0;
+				BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Again, the word was... " + ChatColor.RED + mWordScramble));
+			}
+		}
+		
 	}
 	
 	@Override
