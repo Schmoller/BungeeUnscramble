@@ -73,12 +73,12 @@ public class Unscramble extends Plugin implements Listener
 		mCurrentSession = null;
 	}
 	
-	public void newSession(String word, long length)
+	public void newSession(String word, long length, long hintInterval)
 	{
 		if(mCurrentSession != null)
 			throw new IllegalStateException("Session in progress");
 		
-		Session session = new Session(word, length);
+		Session session = new Session(word, length, hintInterval);
 		session.start();
 		mCurrentSession = session;
 	}

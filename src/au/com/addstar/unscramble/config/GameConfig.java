@@ -15,9 +15,6 @@ public class GameConfig extends Config
 	public GameConfig()
 	{
 		wordList = new ArrayList<String>();
-		hints = new ArrayList<Integer>();
-		hints.add(15);
-		hints.add(5);
 	}
 	
 	@Comment("The time between games in minutes. This time includes the length of the game, so it is the real interval.")
@@ -26,8 +23,9 @@ public class GameConfig extends Config
 	@Comment("The length of the game in seconds")
 	public int length = 30;
 	
-	@Comment("The time left that hints will be given at")
-	public List<Integer> hints;
+	@Path("hint-interval")
+	@Comment("The time between each hint given in seconds. 0 will disable hints")
+	public int hintInterval = 12;
 	
 	@Path("words")
 	@Comment("The words the game can draw from. You can have as many words as you want and they MAY include spaces")
@@ -38,6 +36,6 @@ public class GameConfig extends Config
 		if(wordList.isEmpty())
 			return null;
 		
-		return new Session(wordList.get(Unscramble.rand.nextInt(wordList.size())), length * 1000);
+		return new Session(wordList.get(Unscramble.rand.nextInt(wordList.size())), length * 1000, hintInterval * 1000);
 	}
 }

@@ -19,6 +19,8 @@ public class Session implements Runnable
 	private long mLastAnnounce;
 	
 	private String mHint;
+	private long mHintInterval;
+	private long mLastHint;
 	
 	// TODO: Prize
 	
@@ -26,18 +28,20 @@ public class Session implements Runnable
 	
 	private int mChatLines = 0;
 	
-	public Session(String word, long duration)
+	public Session(String word, long duration, long hintInterval)
 	{
 		mWord = word;
 		mEndTime = System.currentTimeMillis() + duration;
 		
 		mHint = word.replaceAll("[^ ]", "*");
+		mHintInterval = hintInterval;
 		scramble();
 	}
 	
 	public void start()
 	{
 		mTask = BungeeCord.getInstance().getScheduler().schedule(Unscramble.instance, this, 0, 1, TimeUnit.SECONDS);
+		mLastHint = System.currentTimeMillis();
 		BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "New Game! Unscramble " + ChatColor.ITALIC + "this: " + ChatColor.RED + mWordScramble));
 	}
 	
@@ -142,6 +146,12 @@ public class Session implements Runnable
 		{
 			mLastAnnounce = System.currentTimeMillis();
 			BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + getTimeLeftString()));
+		}
+		
+		if(mHintInterval != 0 && System.currentTimeMillis() - mLastHint >= mHintInterval)
+		{
+			doHint();
+			mLastHint = System.currentTimeMillis();
 		}
 	}
 	

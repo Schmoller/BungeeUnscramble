@@ -194,7 +194,7 @@ public class UnscrambleCommand extends Command
 		}
 		
 		// TODO: Hints, prizes
-		Unscramble.instance.newSession(word, time);
+		Unscramble.instance.newSession(word, time, hints);
 	}
 
 }
