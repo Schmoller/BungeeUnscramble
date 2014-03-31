@@ -1,10 +1,14 @@
 package au.com.addstar.unscramble;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import au.com.addstar.unscramble.config.GameConfig;
+import au.com.addstar.unscramble.config.UnclaimedPrizes;
+import au.com.addstar.unscramble.prizes.Prize;
 
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -21,6 +25,8 @@ public class Unscramble extends Plugin implements Listener
 	private Session mCurrentSession = null;
 	private GameConfig mAutoGame;
 	
+	private UnclaimedPrizes mUnclaimed;
+	
 	@Override
 	public void onEnable()
 	{
@@ -30,6 +36,17 @@ public class Unscramble extends Plugin implements Listener
 		
 		getProxy().getPluginManager().registerCommand(this, new UnscrambleCommand());
 		getProxy().getPluginManager().registerListener(this, this);
+		
+		mUnclaimed = new UnclaimedPrizes(new File(getDataFolder(), "unclaimed.yml"));
+		
+		try
+		{
+			mUnclaimed.init();
+		}
+		catch(InvalidConfigurationException e)
+		{
+			throw new RuntimeException(e);
+		}
 		
 		loadAutoGame();
 	}
@@ -73,12 +90,12 @@ public class Unscramble extends Plugin implements Listener
 		mCurrentSession = null;
 	}
 	
-	public void newSession(String word, long length, long hintInterval)
+	public void newSession(String word, long length, long hintInterval, Prize prize)
 	{
 		if(mCurrentSession != null)
 			throw new IllegalStateException("Session in progress");
 		
-		Session session = new Session(word, length, hintInterval);
+		Session session = new Session(word, length, hintInterval, prize);
 		session.start();
 		mCurrentSession = session;
 	}
@@ -106,4 +123,24 @@ public class Unscramble extends Plugin implements Listener
 		return mCurrentSession != null;
 	}
 	
+	public void givePrize(ProxiedPlayer player, Prize prize)
+	{
+		List<Prize> prizes = mUnclaimed.prizes.get(player.getName());
+		if(prizes == null)
+		{
+			prizes = new ArrayList<Prize>();
+			mUnclaimed.prizes.put(player.getName(), prizes);
+		}
+		
+		prizes.add(prize);
+		
+		try
+		{
+			mUnclaimed.save();
+		}
+		catch ( InvalidConfigurationException e )
+		{
+			e.printStackTrace();
+		}
+	}
 }

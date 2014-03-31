@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
+import au.com.addstar.unscramble.prizes.Prize;
+
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -22,25 +24,30 @@ public class Session implements Runnable
 	private long mHintInterval;
 	private long mLastHint;
 	
-	// TODO: Prize
+	private Prize mPrize;
 	
 	private ScheduledTask mTask;
 	
 	private int mChatLines = 0;
 	
-	public Session(String word, long duration, long hintInterval)
+	public Session(String word, long duration, long hintInterval, Prize prize)
 	{
 		mWord = word;
 		mEndTime = System.currentTimeMillis() + duration;
 		
 		mHint = word.replaceAll("[^ ]", "*");
 		mHintInterval = hintInterval;
+		
+		mPrize = prize;
 		scramble();
 	}
 	
 	public void start()
 	{
 		BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "New Game! Unscramble " + ChatColor.ITALIC + "this: " + ChatColor.RED + mWordScramble));
+		if(mPrize != null)
+			BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "The prize for winning is " + ChatColor.YELLOW + mPrize.getDescription()));
+		
 		mTask = BungeeCord.getInstance().getScheduler().schedule(Unscramble.instance, this, 0, 1, TimeUnit.SECONDS);
 		mLastHint = System.currentTimeMillis();
 	}
@@ -94,10 +101,11 @@ public class Session implements Runnable
 			BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Congratulations " + ChatColor.stripColor(player.getDisplayName()) + "!"));
 			mTask.cancel();
 			mTask = null;
-			// TODO: Prizes
+			
+			if(mPrize != null)
+				Unscramble.instance.givePrize(player, mPrize);
 			
 			Unscramble.instance.onSessionFinish();
-			
 		}
 		else
 		{

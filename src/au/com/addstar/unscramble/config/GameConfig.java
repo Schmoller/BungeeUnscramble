@@ -40,6 +40,6 @@ public class GameConfig extends Config
 		if(wordList.isEmpty())
 			return null;
 		
-		return new Session(wordList.get(Unscramble.rand.nextInt(wordList.size())), length * 1000, hintInterval * 1000);
+		return new Session(wordList.get(Unscramble.rand.nextInt(wordList.size())), length * 1000, hintInterval * 1000, null);
 	}
 }

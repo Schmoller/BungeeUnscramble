@@ -2,6 +2,8 @@ package au.com.addstar.unscramble;
 
 import java.util.Arrays;
 
+import au.com.addstar.unscramble.prizes.MoneyPrize;
+
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -152,7 +154,7 @@ public class UnscrambleCommand extends Command
 			String arg = args[i].toLowerCase();
 			
 			if(arg.startsWith("w:"))
-				word = arg.substring(2);
+				word = arg.substring(2).replace('_', ' ');
 			else if(arg.startsWith("t:"))
 			{
 				try
@@ -194,7 +196,7 @@ public class UnscrambleCommand extends Command
 		}
 		
 		// TODO: Hints, prizes
-		Unscramble.instance.newSession(word, time, hints);
+		Unscramble.instance.newSession(word, time, hints, new MoneyPrize(100));
 	}
 
 }
