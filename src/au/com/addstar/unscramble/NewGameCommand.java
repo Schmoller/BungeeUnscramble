@@ -13,7 +13,7 @@ public class NewGameCommand extends Command
 	@Override
 	public void execute( CommandSender sender, String[] args )
 	{
-		Unscramble.instance.newSession("test word", 90000);
+		Unscramble.instance.startAutoGame();
 	}
 
 }
