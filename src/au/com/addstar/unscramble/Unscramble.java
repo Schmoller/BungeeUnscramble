@@ -75,7 +75,10 @@ public class Unscramble extends Plugin implements Listener
 			mAutoGame.init(new File(getDataFolder(), "auto.yml"));
 			
 			if(mConfig.autoGameEnabled)
-				mAutoGameTask = getProxy().getScheduler().schedule(this, new AutoGameStarter(mAutoGame.warningPeriod), mAutoGame.interval, mAutoGame.interval, TimeUnit.MINUTES);
+			{
+				getLogger().info("Starting AutoGame timer. Will only run with at least " + mAutoGame.minPlayers + " players online.");
+				mAutoGameTask = getProxy().getScheduler().schedule(this, new AutoGameStarter(mAutoGame.warningPeriod, mAutoGame.minPlayers), mAutoGame.interval, mAutoGame.interval, TimeUnit.MINUTES);
+			}
 		}
 		catch(InvalidConfigurationException e)
 		{
