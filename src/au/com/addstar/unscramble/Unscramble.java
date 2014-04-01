@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import au.com.addstar.unscramble.config.GameConfig;
+import au.com.addstar.unscramble.config.MainConfig;
 import au.com.addstar.unscramble.config.UnclaimedPrizes;
 import au.com.addstar.unscramble.prizes.Prize;
 import au.com.addstar.unscramble.prizes.SavedPrize;
@@ -23,6 +24,7 @@ import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 import net.md_5.bungee.event.EventHandler;
 
 public class Unscramble extends Plugin implements Listener
@@ -32,6 +34,8 @@ public class Unscramble extends Plugin implements Listener
 	
 	private Session mCurrentSession = null;
 	private GameConfig mAutoGame;
+	private ScheduledTask mAutoGameTask;
+	private MainConfig mConfig;
 	
 	private UnclaimedPrizes mUnclaimed;
 	
@@ -48,18 +52,10 @@ public class Unscramble extends Plugin implements Listener
 		getProxy().getPluginManager().registerListener(this, this);
 		getProxy().registerChannel("Unscramble");
 		
+		mConfig = new MainConfig(new File(getDataFolder(), "config.yml"));
 		mUnclaimed = new UnclaimedPrizes(new File(getDataFolder(), "unclaimed.yml"));
 		
-		try
-		{
-			mUnclaimed.init();
-		}
-		catch(InvalidConfigurationException e)
-		{
-			throw new RuntimeException(e);
-		}
-		
-		loadAutoGame();
+		reload();
 	}
 	
 	@Override
@@ -69,12 +65,17 @@ public class Unscramble extends Plugin implements Listener
 	
 	private void loadAutoGame()
 	{
+		if(mAutoGameTask != null)
+			mAutoGameTask.cancel();
+		mAutoGameTask = null;
+		
 		mAutoGame = new GameConfig();
 		try
 		{
 			mAutoGame.init(new File(getDataFolder(), "auto.yml"));
 			
-			getProxy().getScheduler().schedule(this, new AutoGameStarter(mAutoGame.warningPeriod), mAutoGame.interval, mAutoGame.interval, TimeUnit.MINUTES);
+			if(mConfig.autoGameEnabled)
+				mAutoGameTask = getProxy().getScheduler().schedule(this, new AutoGameStarter(mAutoGame.warningPeriod), mAutoGame.interval, mAutoGame.interval, TimeUnit.MINUTES);
 		}
 		catch(InvalidConfigurationException e)
 		{
@@ -82,6 +83,21 @@ public class Unscramble extends Plugin implements Listener
 			System.err.println("Could not load auto game: " + e.getMessage());
 			e.printStackTrace();
 		}
+	}
+	
+	public void reload()
+	{
+		try
+		{
+			mConfig.init();
+			mUnclaimed.init();
+		}
+		catch(InvalidConfigurationException e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		loadAutoGame();
 	}
 	
 	@EventHandler
@@ -170,6 +186,19 @@ public class Unscramble extends Plugin implements Listener
 	public void startPrizeSession(int sessionId, ProxiedPlayer player, Prize prize)
 	{
 		mActiveSessions.put(sessionId, new SavedPrize(player.getName(), prize));
+	}
+	
+	public String getRandomWord()
+	{
+		if(mConfig.words.isEmpty())
+			return "unscramble";
+		
+		return mConfig.words.get(rand.nextInt(mConfig.words.size()));
+	}
+	
+	public MainConfig getConfig()
+	{
+		return mConfig;
 	}
 	
 	@EventHandler

@@ -132,7 +132,8 @@ public class UnscrambleCommand extends Command
 	
 	private void commandReload(CommandSender sender)
 	{
-		
+		Unscramble.instance.reload();
+		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "Reloaded unscramble configs"));
 	}
 	
 	private void commandHint(CommandSender sender)
@@ -166,7 +167,7 @@ public class UnscrambleCommand extends Command
 			return;
 		}
 		
-		String word = "random";
+		String word = "";
 		int hints = 0;
 		int time = 30000;
 		Prize prize = null;

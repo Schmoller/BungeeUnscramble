@@ -32,6 +32,9 @@ public class Session implements Runnable
 	
 	public Session(String word, long duration, long hintInterval, Prize prize)
 	{
+		if(word.isEmpty())
+			word = Unscramble.instance.getRandomWord();
+		
 		mWord = word;
 		mEndTime = System.currentTimeMillis() + duration;
 		
@@ -59,7 +62,8 @@ public class Session implements Runnable
 		Unscramble.instance.onSessionFinish();
 		
 		BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Oh! Sorry, the game was cancelled."));
-		BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "The answer was... " + ChatColor.RED + mWord));
+		if(Unscramble.instance.getConfig().displayAnswer)
+			BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "The answer was... " + ChatColor.RED + mWord));
 	}
 	
 	public void doHint()
@@ -137,7 +141,8 @@ public class Session implements Runnable
 		if(left <= 0)
 		{
 			BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Oh! Sorry, you didnt get the word in time!"));
-			BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "The answer was... " + ChatColor.RED + mWord));
+			if(Unscramble.instance.getConfig().displayAnswer)
+				BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "The answer was... " + ChatColor.RED + mWord));
 
 			mTask.cancel();
 			mTask = null;
