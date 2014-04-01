@@ -91,14 +91,13 @@ public class Session implements Runnable
 		return mTask != null;
 	}
 	
-	public void makeGuess(ProxiedPlayer player, String guess)
+	public void makeGuess(final ProxiedPlayer player, String guess)
 	{
 		if(!isRunning())
 			return;
 		
 		if(mWord.equalsIgnoreCase(guess))
 		{
-			BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Congratulations " + ChatColor.stripColor(player.getDisplayName()) + "!"));
 			mTask.cancel();
 			mTask = null;
 			
@@ -106,6 +105,17 @@ public class Session implements Runnable
 				Unscramble.instance.givePrize(player, mPrize);
 			
 			Unscramble.instance.onSessionFinish();
+			
+			BungeeCord.getInstance().getScheduler().schedule(Unscramble.instance, new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Congratulations " + ChatColor.stripColor(player.getDisplayName()) + "!"));
+					if(mPrize != null)
+						player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Use " + ChatColor.RED + "/us claim" + ChatColor.DARK_AQUA + " to claim your prize!"));
+				}
+			}, 50, TimeUnit.MILLISECONDS);
 		}
 		else
 		{
