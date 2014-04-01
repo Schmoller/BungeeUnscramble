@@ -122,9 +122,8 @@ public class UnscrambleCommand extends Command
 			
 			for(Prize prize : prizes)
 			{
-				sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "You have been awarded " + ChatColor.YELLOW + prize.getDescription()));
-				prize.award(player);
-				// TODO: we need to handle not being able to give prizes
+				int session = prize.award(player);
+				Unscramble.instance.startPrizeSession(session, player, prize);
 			}
 		}
 		else

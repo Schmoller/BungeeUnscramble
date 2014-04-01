@@ -1,7 +1,11 @@
 package au.com.addstar.unscramble.prizes;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import au.com.addstar.unscramble.MessageOutput;
 
@@ -28,15 +32,25 @@ public class ItemPrize extends Prize
 	}
 
 	@Override
-	public void award( ProxiedPlayer player )
+	public int award( ProxiedPlayer player )
 	{
+		int session = nextSession++;
 		new MessageOutput("Unscramble", "AwardItem")
-			.writeInt(0)
+			.writeInt(session)
 			.writeUTF(player.getName())
 			.writeUTF(mMaterial)
 			.writeByte(mData)
 			.writeByte(mCount)
 			.send(player.getServer().getInfo());
+		
+		return session;
+	}
+	
+	@Override
+	public Entry<Prize, String> handleFail( DataInputStream input ) throws IOException
+	{
+		int remaining = input.readInt();
+		return new AbstractMap.SimpleEntry<Prize, String>(new ItemPrize(mMaterial, mData, remaining), "Your inventory was full. Please clear space then try again");
 	}
 
 	@Override
