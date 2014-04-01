@@ -33,7 +33,6 @@ public class GameConfig extends Config
 		try
 		{
 			addConverter(WeightedPrizeSaver.class);
-			System.out.println("c: " + converter.getConverter(WeightedPrize.class));
 		}
 		catch(InvalidConverterException e)
 		{

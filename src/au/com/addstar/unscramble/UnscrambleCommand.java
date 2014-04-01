@@ -112,11 +112,36 @@ public class UnscrambleCommand extends Command
 		if(sender instanceof ProxiedPlayer)
 		{
 			ProxiedPlayer player = (ProxiedPlayer)sender;
+			List<String> claimServers = Unscramble.instance.getConfig().claimServers;
+			if(!claimServers.isEmpty() && !claimServers.contains(player.getServer().getInfo().getName()))
+			{
+				String serverString = "";
+				for(int i = 0; i < claimServers.size(); ++i)
+				{
+					String server = claimServers.get(i);
+					
+					if(i != 0)
+					{
+						if(i != claimServers.size()-1)
+							serverString += ", ";
+						else
+							serverString += " or ";
+					}
+					
+					serverString += server;
+				}
+				
+				if(claimServers.size() > 1)
+					serverString = "either " + serverString;
+					
+				sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + "You may not claim your prizes here. Please go to " + serverString));
+				return;
+			}
 			
 			List<Prize> prizes = Unscramble.instance.getPrizes(player, true);
 			if(prizes == null || prizes.isEmpty())
 			{
-				sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_RED + "No prizes found under your name."));
+				sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + "No prizes found under your name."));
 				return;
 			}
 			
@@ -127,7 +152,7 @@ public class UnscrambleCommand extends Command
 			}
 		}
 		else
-			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_RED + "No prizes found under your name."));
+			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + "No prizes found under your name."));
 	}
 	
 	private void commandReload(CommandSender sender)

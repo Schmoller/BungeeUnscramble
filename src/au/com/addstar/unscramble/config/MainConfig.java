@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.cubespace.Yamler.Config.Comment;
 import net.cubespace.Yamler.Config.Config;
 import net.cubespace.Yamler.Config.Path;
 
@@ -22,4 +23,8 @@ public class MainConfig extends Config
 	
 	@Path("auto-game-enabled")
 	public boolean autoGameEnabled = false;
+	
+	@Path("claim-servers")
+	@Comment("The names of servers players may claim their rewards on")
+	public List<String> claimServers = new ArrayList<String>();
 }
