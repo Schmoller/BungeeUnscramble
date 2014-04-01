@@ -73,6 +73,7 @@ public class Unscramble extends Plugin implements Listener
 		try
 		{
 			mAutoGame.init(new File(getDataFolder(), "auto.yml"));
+			mAutoGame.initialize();
 			
 			if(mConfig.autoGameEnabled)
 			{

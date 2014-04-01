@@ -22,10 +22,7 @@ public class AutoGameStarter implements Runnable
 		if(BungeeCord.getInstance().getOnlineCount() >= mMinPlayers)
 			return true;
 		else
-		{
-			Unscramble.instance.getLogger().info("Not running auto game as there is not enough people on");
 			return false;
-		}
 	}
 	
 	@Override
