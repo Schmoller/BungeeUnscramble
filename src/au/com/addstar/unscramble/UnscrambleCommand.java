@@ -3,8 +3,8 @@ package au.com.addstar.unscramble;
 import java.util.Arrays;
 import java.util.List;
 
-import au.com.addstar.unscramble.prizes.ItemPrize;
 import au.com.addstar.unscramble.prizes.Prize;
+import au.com.addstar.unscramble.prizes.Prizes;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -101,7 +101,7 @@ public class UnscrambleCommand extends Command
 			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "cancel " + ChatColor.YELLOW + "- Cancels any currently running game."));
 		
 		if(sender.hasPermission("unscramble.newgame"))
-			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "newgame w:[word] p:<prize> a:<amount> t:<time> h:<hint-interval> " + ChatColor.YELLOW + "- Starts a new game with the given details"));
+			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "newgame w:[word] t:[time] h:[hint-interval] [prize]" + ChatColor.YELLOW + "- Starts a new game with the given details"));
 		
 		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Note: Underscores (_) will be changed into spaces."));
 		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.DARK_PURPLE + "====================================================="));
@@ -166,9 +166,10 @@ public class UnscrambleCommand extends Command
 			return;
 		}
 		
-		String word = "";
+		String word = "random";
 		int hints = 0;
 		int time = 30000;
+		Prize prize = null;
 		
 		for(int i = 0; i < args.length; ++i)
 		{
@@ -183,7 +184,7 @@ public class UnscrambleCommand extends Command
 					time = Integer.parseInt(arg.substring(2));
 					if(time <= 0)
 					{
-						sender.sendMessage(TextComponent.fromLegacyText("Time must be 1 or greater"));
+						sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Time must be 1 or greater"));
 						return;
 					}
 					
@@ -191,7 +192,7 @@ public class UnscrambleCommand extends Command
 				}
 				catch(NumberFormatException e)
 				{
-					sender.sendMessage(TextComponent.fromLegacyText("Time must be number 1 or greater"));
+					sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Time must be number 1 or greater"));
 					return;
 				}
 			}
@@ -202,7 +203,7 @@ public class UnscrambleCommand extends Command
 					hints = Integer.parseInt(arg.substring(2));
 					if(hints <= 0)
 					{
-						sender.sendMessage(TextComponent.fromLegacyText("Hint interval must be 1 or greater"));
+						sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Hint interval must be 1 or greater"));
 						return;
 					}
 					
@@ -210,13 +211,40 @@ public class UnscrambleCommand extends Command
 				}
 				catch(NumberFormatException e)
 				{
-					sender.sendMessage(TextComponent.fromLegacyText("Hint interval must be number 1 or greater"));
+					sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Hint interval must be number 1 or greater"));
 					return;
 				}
 			}
+			else
+			{
+				String prizeString = "";
+				for(int j = i; j < args.length; ++j)
+				{
+					if(!prizeString.isEmpty())
+						prizeString += " ";
+					prizeString += args[j];
+				}
+				
+				try
+				{
+					prize = Prizes.parse(prizeString);
+					if(prize == null)
+					{
+						sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Cannot create prize from '" + prizeString + "'. Please check your typing."));
+						return;
+					}
+				}
+				catch(IllegalArgumentException e)
+				{
+					sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + e.getMessage()));
+					return;
+				}
+				
+				break;
+			}
 		}
 		
-		Unscramble.instance.newSession(word, time, hints, new ItemPrize("SMOOTH_BRICK", 3, 20));
+		Unscramble.instance.newSession(word, time, hints, prize);
 	}
 
 }
