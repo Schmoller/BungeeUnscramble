@@ -119,7 +119,7 @@ public class Session implements Runnable
 					if(mPrize != null)
 						player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Use " + ChatColor.RED + "/us claim" + ChatColor.DARK_AQUA + " to claim your prize!"));
 				}
-			}, 50, TimeUnit.MILLISECONDS);
+			}, 200, TimeUnit.MILLISECONDS);
 		}
 		else
 		{
