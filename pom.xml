@@ -21,6 +21,11 @@
     </repository>
     
     <repository>
+      <id>md_5</id>
+      <url>https://oss.sonatype.org/content/groups/public/</url>
+    </repository>
+    
+    <repository>
       <id>Yamler</id>
       <url>http://nexus.cube-space.net/content/groups/public/</url>
     </repository>
@@ -33,8 +38,8 @@
   <dependencies>
     <dependency>
         <groupId>net.md-5</groupId>
-        <artifactId>bungeecord</artifactId>
-        <version>1.7</version>
+        <artifactId>bungeecord-api</artifactId>
+        <version>1.7-SNAPSHOT</version>
     	<type>jar</type>
   	</dependency>
   	

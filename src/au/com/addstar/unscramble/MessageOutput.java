@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
 public class MessageOutput
@@ -222,7 +222,7 @@ public class MessageOutput
 	public void send()
 	{
 		byte[] data = mStream.toByteArray();
-		for(ServerInfo server : BungeeCord.getInstance().getServers().values())
+		for(ServerInfo server : ProxyServer.getInstance().getServers().values())
 			server.sendData(mChannel, data);
 	}
 }

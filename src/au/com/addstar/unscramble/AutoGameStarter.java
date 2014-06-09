@@ -2,8 +2,8 @@ package au.com.addstar.unscramble;
 
 import java.util.concurrent.TimeUnit;
 
-import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class AutoGameStarter implements Runnable
@@ -19,7 +19,7 @@ public class AutoGameStarter implements Runnable
 	
 	private boolean canRun()
 	{
-		if(BungeeCord.getInstance().getOnlineCount() >= mMinPlayers)
+		if(ProxyServer.getInstance().getOnlineCount() >= mMinPlayers)
 			return true;
 		else
 			return false;
@@ -35,8 +35,8 @@ public class AutoGameStarter implements Runnable
 			Unscramble.instance.startAutoGame();
 		else
 		{
-			BungeeCord.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.YELLOW + "A game of unscramble is about to start!"));
-			BungeeCord.getInstance().getScheduler().schedule(Unscramble.instance, new Runnable()
+			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.YELLOW + "A game of unscramble is about to start!"));
+			ProxyServer.getInstance().getScheduler().schedule(Unscramble.instance, new Runnable()
 			{
 				@Override
 				public void run()
