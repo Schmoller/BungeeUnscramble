@@ -99,7 +99,9 @@ public class Session implements Runnable
 	{
 		if(!isRunning())
 			return;
-		
+
+        guess = net.md_5.bungee.api.ChatColor.stripColor(guess);
+
 		if(mWord.equalsIgnoreCase(guess))
 		{
 			mTask.cancel();
