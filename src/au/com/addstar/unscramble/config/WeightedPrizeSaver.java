@@ -17,14 +17,19 @@ public class WeightedPrizeSaver implements Converter
 	@Override
 	public Object fromConfig( Class<?> clazz, Object obj, ParameterizedType type ) throws Exception
 	{
+		if((obj instanceof WeightedPrize))
+		{
+			return (WeightedPrize)obj;
+		}
+
 		if(!(obj instanceof Map))
 			return null;
-		
+
 		Map<?, ?> map = (Map<?, ?>)obj;
-		
+
 		if(map.isEmpty())
 			return null;
-		
+
 		WeightedPrize prize = new WeightedPrize();
 		Entry<?, ?> entry = map.entrySet().iterator().next();
 		prize.weight = Integer.valueOf((String)entry.getKey());

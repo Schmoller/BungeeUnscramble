@@ -3,6 +3,7 @@ package au.com.addstar.unscramble;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import au.com.addstar.unscramble.prizes.Prize;
 
@@ -29,7 +30,9 @@ public class Session implements Runnable
 	private ScheduledTask mTask;
 	
 	private int mChatLines = 0;
-	
+
+	private Pattern STRIP_COLOR_PATTERN;
+
 	public Session(String word, long duration, long hintInterval, Prize prize)
 	{
 		if(word.isEmpty())
@@ -40,7 +43,11 @@ public class Session implements Runnable
 		
 		mHint = word.replaceAll("[^ ]", "*");
 		mHintInterval = hintInterval;
-		
+
+		// From Bungeecord-Chat, specifically net.md_5.bungee.api.ChatColor.stripColor
+		// Updated to change COLOR_CHAR from '§' to '&'
+		STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + String.valueOf('&') + "[0-9A-FK-OR]");
+
 		mPrize = prize;
 		scramble();
 	}
@@ -100,7 +107,7 @@ public class Session implements Runnable
 		if(!isRunning())
 			return;
 
-        guess = net.md_5.bungee.api.ChatColor.stripColor(guess);
+		guess = STRIP_COLOR_PATTERN.matcher(guess).replaceAll("");
 
 		if(mWord.equalsIgnoreCase(guess))
 		{
