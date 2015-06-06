@@ -46,7 +46,7 @@ public class Session implements Runnable
 
 		// From Bungeecord-Chat, specifically net.md_5.bungee.api.ChatColor.stripColor
 		// Updated to change COLOR_CHAR from '§' to '&'
-		STRIP_COLOR_PATTERN = Pattern.compile("(?i)" + String.valueOf('&') + "[0-9A-FK-OR]");
+		STRIP_COLOR_PATTERN = Pattern.compile("(?i)&[0-9A-FK-OR]");
 
 		mPrize = prize;
 		scramble();
