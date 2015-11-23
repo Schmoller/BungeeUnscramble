@@ -2,9 +2,11 @@ package au.com.addstar.unscramble;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import au.com.addstar.unscramble.prizes.Prize;
 import au.com.addstar.unscramble.prizes.Prizes;
+import au.com.addstar.unscramble.prizes.SavedPrize;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -37,6 +39,7 @@ public class UnscrambleCommand extends Command
 		{
 			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.DARK_PURPLE + "====================================================="));
 			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + " Welcome to " + ChatColor.RED + "Unscramble " + ChatColor.GREEN + "Plugin " + ChatColor.BLUE + "(" + Unscramble.instance.getDescription().getVersion() + ")"));
+			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + " Help is available with " + ChatColor.GOLD + "/unscramble help"));
 			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.DARK_PURPLE + "====================================================="));
 		}
 		else
@@ -111,7 +114,8 @@ public class UnscrambleCommand extends Command
 	{
 		if(sender instanceof ProxiedPlayer)
 		{
-			ProxiedPlayer player = (ProxiedPlayer)sender;
+			final ProxiedPlayer player = (ProxiedPlayer)sender;
+
 			List<String> claimServers = Unscramble.instance.getConfig().claimServers;
 			if(!claimServers.isEmpty() && !claimServers.contains(player.getServer().getInfo().getName()))
 			{
@@ -138,17 +142,42 @@ public class UnscrambleCommand extends Command
 				return;
 			}
 			
-			List<Prize> prizes = Unscramble.instance.getPrizes(player, true);
+			List<SavedPrize> prizes = Unscramble.instance.getPrizes(player, true);
 			if(prizes == null || prizes.isEmpty())
 			{
 				sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + "No prizes found under your name."));
 				return;
 			}
-			
-			for(Prize prize : prizes)
+
+			// Keep track of the number of prizes awarded
+			// Allow the player to claim up to 10 at a time to avoid too many simultaneous sessions or
+			// spamming the user with "Your inventory was full" messages if they run out of room
+			int prizesAwarded = 0;
+
+			for(SavedPrize prize : prizes)
 			{
-				int session = prize.award(player);
-				Unscramble.instance.startPrizeSession(session, player, prize);
+				int session = prize.prize.award(player);
+				Unscramble.instance.startPrizeSession(session, player, prize.prize);
+
+				if(++prizesAwarded >= 10) {
+					if(prizesAwarded < prizes.size()) {
+
+						// More prizes remain; inform the player
+						// Using a 2 second delay to prevent the message from appearing before the messages regarding awarded prizes
+
+						Runnable task = new Runnable() {
+							@Override
+							public void run() {
+
+								player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "You have more prizes to claim. Make sure you have free inventory space then use " + ChatColor.GOLD + "/us claim" + ChatColor.DARK_AQUA + " again"));
+							}
+						};
+
+						Unscramble.instance.getProxy().getScheduler().schedule(Unscramble.instance, task, 2, TimeUnit.SECONDS);
+
+						break;
+					}
+				}
 			}
 		}
 		else

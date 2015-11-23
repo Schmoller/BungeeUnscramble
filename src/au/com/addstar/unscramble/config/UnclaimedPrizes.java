@@ -2,6 +2,7 @@ package au.com.addstar.unscramble.config;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,18 +32,18 @@ public class UnclaimedPrizes extends Config
 	
 	public List<SavedPrize> prizes;
 	
-	public List<Prize> getPrizes(String player, boolean remove)
+	public List<SavedPrize> getPrizes(String player, boolean remove)
 	{
-		ArrayList<Prize> prizes = new ArrayList<Prize>();
+		ArrayList<SavedPrize> prizes = new ArrayList<SavedPrize>();
 		Iterator<SavedPrize> it = this.prizes.iterator();
 		
 		while(it.hasNext())
 		{
 			SavedPrize prize = it.next();
-			
+
 			if(prize.player.equals(player))
 			{
-				prizes.add(prize.prize);
+				prizes.add(prize);
 				if(remove)
 					it.remove();
 			}
@@ -50,4 +51,5 @@ public class UnclaimedPrizes extends Config
 		
 		return prizes;
 	}
+
 }

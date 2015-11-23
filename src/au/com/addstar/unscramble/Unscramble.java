@@ -4,7 +4,11 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Map.Entry;
@@ -22,6 +26,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
+import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
@@ -31,50 +36,52 @@ public class Unscramble extends Plugin implements Listener
 {
 	public static Random rand = new Random();
 	public static Unscramble instance;
-	
+
 	private Session mCurrentSession = null;
 	private GameConfig mAutoGame;
 	private ScheduledTask mAutoGameTask;
 	private MainConfig mConfig;
-	
+
 	private UnclaimedPrizes mUnclaimed;
-	
+
+	private SimpleDateFormat mDateParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
 	private HashMap<Integer, SavedPrize> mActiveSessions = new HashMap<Integer, SavedPrize>();
-	
+
 	@Override
 	public void onEnable()
 	{
 		instance = this;
-		
+
 		getDataFolder().mkdirs();
-		
+
 		getProxy().getPluginManager().registerCommand(this, new UnscrambleCommand());
 		getProxy().getPluginManager().registerListener(this, this);
 		getProxy().registerChannel("Unscramble");
-		
+
 		mConfig = new MainConfig(new File(getDataFolder(), "config.yml"));
 		mUnclaimed = new UnclaimedPrizes(new File(getDataFolder(), "unclaimed.yml"));
-		
+
 		reload();
 	}
-	
+
 	@Override
 	public void onDisable()
 	{
 	}
-	
+
 	private void loadAutoGame()
 	{
 		if(mAutoGameTask != null)
 			mAutoGameTask.cancel();
 		mAutoGameTask = null;
-		
+
 		mAutoGame = new GameConfig();
 		try
 		{
 			mAutoGame.init(new File(getDataFolder(), "auto.yml"));
 			mAutoGame.initialize();
-			
+
 			if(mConfig.autoGameEnabled)
 			{
 				getLogger().info("Starting AutoGame timer. Will only run with at least " + mAutoGame.minPlayers + " players online.");
@@ -88,7 +95,7 @@ public class Unscramble extends Plugin implements Listener
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void reload()
 	{
 		try
@@ -100,64 +107,83 @@ public class Unscramble extends Plugin implements Listener
 		{
 			throw new RuntimeException(e);
 		}
-		
+
 		loadAutoGame();
 	}
-	
+
 	@EventHandler
 	public void onPlayerChat(ChatEvent event)
 	{
 		if(event.getSender() instanceof ProxiedPlayer)
 		{
 			ProxiedPlayer player = (ProxiedPlayer)event.getSender();
-			
+
 			if(mCurrentSession != null)
 				mCurrentSession.makeGuess(player, event.getMessage());
 		}
 	}
-	
+
+	@EventHandler
+	public void onPostLogin(PostLoginEvent event) {
+
+		if(event.getPlayer() instanceof ProxiedPlayer)
+		{
+			ProxiedPlayer player = event.getPlayer();
+
+			List<SavedPrize> prizes = getPrizes(player, false);
+
+			if(prizes != null && !prizes.isEmpty()) {
+				NotifyPlayerUnclaimedPrizes(player, prizes);
+			}
+		}
+
+	}
+
 	public void onSessionFinish()
 	{
 		mCurrentSession = null;
 	}
-	
+
 	public void newSession(String word, long length, long hintInterval, Prize prize)
 	{
 		if(mCurrentSession != null)
 			throw new IllegalStateException("Session in progress");
-		
+
 		Session session = new Session(word, length, hintInterval, prize);
 		session.start();
 		mCurrentSession = session;
 	}
-	
+
 	public void startAutoGame()
 	{
 		if(mAutoGame == null || mCurrentSession != null)
 			return;
-		
+
 		Session session = mAutoGame.newSession();
 		if(session == null)
 			return;
-		
+
 		session.start();
 		mCurrentSession = session;
 	}
-	
+
 	public Session getSession()
 	{
 		return mCurrentSession;
 	}
-	
+
 	public boolean isSessionRunning()
 	{
 		return mCurrentSession != null;
 	}
-	
+
 	public void givePrize(ProxiedPlayer player, Prize prize)
 	{
 		mUnclaimed.prizes.add(new SavedPrize(player.getName(), prize));
-		
+
+		// Check for and remove expired prizes
+		removeExpiredPrizes();
+
 		try
 		{
 			mUnclaimed.save();
@@ -167,12 +193,12 @@ public class Unscramble extends Plugin implements Listener
 			e.printStackTrace();
 		}
 	}
-	
-	public List<Prize> getPrizes(ProxiedPlayer player, boolean remove)
+
+	public List<SavedPrize> getPrizes(ProxiedPlayer player, boolean remove)
 	{
 		if(remove)
 		{
-			List<Prize> prizes = mUnclaimed.getPrizes(player.getName(), true);
+			List<SavedPrize> prizes = mUnclaimed.getPrizes(player.getName(), true);
 			try
 			{
 				mUnclaimed.save();
@@ -186,42 +212,42 @@ public class Unscramble extends Plugin implements Listener
 		else
 			return mUnclaimed.getPrizes(player.getName(), false);
 	}
-	
+
 	public void startPrizeSession(int sessionId, ProxiedPlayer player, Prize prize)
 	{
 		mActiveSessions.put(sessionId, new SavedPrize(player.getName(), prize));
 	}
-	
+
 	public String getRandomWord()
 	{
 		if(mConfig.words.isEmpty())
 			return "unscramble";
-		
+
 		return mConfig.words.get(rand.nextInt(mConfig.words.size()));
 	}
-	
+
 	public MainConfig getConfig()
 	{
 		return mConfig;
 	}
-	
+
 	@EventHandler
 	public void onPluginMessage(PluginMessageEvent event)
 	{
 		if(!event.getTag().equals("Unscramble"))
 			return;
-		
+
 		ByteArrayInputStream stream = new ByteArrayInputStream(event.getData());
 		DataInputStream input = new DataInputStream(stream);
-		
+
 		try
 		{
 			String subChannel = input.readUTF();
 			int session = input.readInt();
-			
+
 			SavedPrize prize = mActiveSessions.remove(session);
 			ProxiedPlayer player = getProxy().getPlayer(prize.player);
-			
+
 			if(subChannel.equals("AwardFail"))
 			{
 				byte hasMoreData = input.readByte();
@@ -243,7 +269,7 @@ public class Unscramble extends Plugin implements Listener
 					mUnclaimed.prizes.add(prize);
 					player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + "You can not claim the prize " + prize.prize.getDescription() + " in this location."));
 				}
-				
+
 				try
 				{
 					mUnclaimed.save();
@@ -260,6 +286,140 @@ public class Unscramble extends Plugin implements Listener
 		}
 		catch(IOException e)
 		{
-		}	
+		}
 	}
+
+	private Date ParseDate(String dateValue) {
+
+		try {
+			Date parsedDate = mDateParser.parse(dateValue);
+			return parsedDate;
+
+		} catch (ParseException ex) {
+			return null;
+		}
+
+	}
+
+	private void NotifyPlayerUnclaimedPrizes(final ProxiedPlayer player, List<SavedPrize> prizes) {
+
+		final int prizeCount = prizes.size();
+
+		// Determine the oldest and newest prizes
+		long currentTimeMillis = System.currentTimeMillis();
+		long earliestPrizeEntered = currentTimeMillis;
+		long newestPrizeEntered = 0;
+
+		long prizeExpirationDays = mConfig.prizeExpirationDays;
+
+		// Do not allow prizes less than one week old to expire
+		if(prizeExpirationDays < 7)
+			prizeExpirationDays = 7;
+
+		long expirationTimeMillis = currentTimeMillis - prizeExpirationDays * 86400 * 1000;
+
+		for(SavedPrize prize : prizes) {
+
+			if(prize.entered == null || prize.entered.isEmpty()) {
+				prize.entered = mDateParser.format(currentTimeMillis);
+			}
+
+			Date prizeDate = ParseDate(prize.entered);
+
+			if(prizeDate != null) {
+
+				if(prizeDate.getTime() > expirationTimeMillis) {
+					long prizeDateMillis = prizeDate.getTime();
+
+					if(prizeDateMillis < earliestPrizeEntered) {
+						earliestPrizeEntered = prizeDateMillis;
+					}
+
+					if(prizeDateMillis > newestPrizeEntered) {
+						newestPrizeEntered = prizeDateMillis;
+					}
+				}
+			}
+
+		}
+
+		if(newestPrizeEntered < currentTimeMillis - prizeExpirationDays * 86400 * 1000) {
+			// All of the player's prizes are expired
+			return;
+		}
+
+		// Warn the player if any prizes will expire soon
+		long expiredPrizeWarnThreshold = currentTimeMillis - (prizeExpirationDays - mConfig.expiringPrizeWarningDays) * 86400 * 1000;
+
+		String expirationMessage = "";
+		if(earliestPrizeEntered < expiredPrizeWarnThreshold) {
+			double daysToExpiration = (earliestPrizeEntered - (currentTimeMillis - prizeExpirationDays * 86400 * 1000)) / 1000.0 / 86400.0;
+			if(daysToExpiration < 0)
+				daysToExpiration = 0.0;
+
+			if(prizeCount > 1)
+				expirationMessage = String.format("Warning: Prizes will expire in %.1f days. ", daysToExpiration);
+			else
+				expirationMessage = String.format("Warning: Prize expires in %.1f days. ", daysToExpiration);
+
+		}
+
+		final String formattedExpirationMessage = expirationMessage;
+
+		Runnable task = new Runnable() {
+			@Override
+			public void run() {
+
+				String prizeMessage;
+
+				if(prizeCount > 1)
+					prizeMessage = ChatColor.GOLD + Integer.toString(prizeCount) + ChatColor.GREEN + " unclaimed prizes. ";
+				else
+					prizeMessage = ChatColor.GOLD + "1" +  ChatColor.GREEN + " unclaimed prize. ";
+
+				player.sendMessage(TextComponent.fromLegacyText(ChatColor.GRAY + "[Unscramble] " + ChatColor.GREEN + "You have " + prizeMessage + formattedExpirationMessage + "Claim with " + ChatColor.GOLD + "/us claim"));
+			}
+		};
+
+		getProxy().getScheduler().schedule(this, task, 5, TimeUnit.SECONDS);
+	}
+
+	public void removeExpiredPrizes()
+	{
+
+		try
+		{
+			long prizeExpirationDays = mConfig.prizeExpirationDays;
+			if(prizeExpirationDays < 7)
+				prizeExpirationDays = 7;
+
+			long expirationTimeMillis = System.currentTimeMillis() - prizeExpirationDays * 86400 * 1000;
+
+			getLogger().info("Looking for expired unclaimed prizes; count = " + mUnclaimed.prizes.size());
+
+			Iterator<SavedPrize> it = mUnclaimed.prizes.iterator();
+
+			while(it.hasNext())
+			{
+				SavedPrize prize = it.next();
+
+				if(prize.entered == null || prize.entered.isEmpty()) {
+					prize.entered = mDateParser.format(System.currentTimeMillis());
+				}
+
+				Date prizeDate = ParseDate(prize.entered);
+
+				if(prizeDate != null && prizeDate.getTime() < expirationTimeMillis) {
+					getLogger().info("Removing expired prize for " + prize.player + ", awarded " + prize.entered + "; " + prize.prize.getDescription());
+					it.remove();
+				}
+			}
+
+		}
+		catch ( Exception e )
+		{
+			e.printStackTrace();
+		}
+	}
+
 }
