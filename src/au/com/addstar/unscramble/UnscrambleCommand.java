@@ -90,23 +90,25 @@ public class UnscrambleCommand extends Command
 	private void commandHelp(CommandSender sender)
 	{
 		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.DARK_PURPLE + "=================" + ChatColor.RED + " [ Unscramble Help ] " + ChatColor.DARK_PURPLE + "=================="));
-		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.YELLOW + "- States the general info."));
-		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "claim " + ChatColor.YELLOW + "- Claims any prizes you have won."));
-		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "help " + ChatColor.YELLOW + "- Shows this screen."));
+		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.YELLOW + "- States the general info"));
+		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "claim " + ChatColor.YELLOW + "- Claims any prizes you have won"));
+		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "help " + ChatColor.YELLOW + "- Shows this screen"));
 		
 		if(sender.hasPermission("unscramble.reload"))
-			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "reload " + ChatColor.YELLOW + "- Reloads the config."));
+			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "reload " + ChatColor.YELLOW + "- Reloads the config"));
 		
 		if(sender.hasPermission("unscramble.hint"))
-			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "hint " + ChatColor.YELLOW + "- Gives a hint on the current word."));
+			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "hint " + ChatColor.YELLOW + "- Gives a hint on the current word"));
 		
 		if(sender.hasPermission("unscramble.cancel"))
-			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "cancel " + ChatColor.YELLOW + "- Cancels any currently running game."));
+			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "cancel " + ChatColor.YELLOW + "- Cancels any currently running game"));
 		
-		if(sender.hasPermission("unscramble.newgame"))
-			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "newgame w:[word] t:[time] h:[hint-interval] [prize]" + ChatColor.YELLOW + "- Starts a new game with the given details"));
-		
-		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Note: Underscores (_) will be changed into spaces."));
+		if(sender.hasPermission("unscramble.newgame")) {
+			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "newgame w:[word] t:[time] h:[hint-interval] [prize] " + ChatColor.YELLOW + "- Starts a new game with the given details"));
+			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + " [prize] examples: " + ChatColor.GOLD  + "item diamond 1" + ChatColor.GREEN + " or " + ChatColor.GOLD  + "$150"));
+			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + " Note: Underscores (_) in [word] will be changed into spaces"));
+		}
+
 		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.DARK_PURPLE + "====================================================="));
 	}
 	

@@ -351,20 +351,17 @@ public class Unscramble extends Plugin implements Listener
 		// Warn the player if any prizes will expire soon
 		long expiredPrizeWarnThreshold = currentTimeMillis - (prizeExpirationDays - mConfig.expiringPrizeWarningDays) * 86400 * 1000;
 
-		String expirationMessage = "";
+		final String expirationMessage;
 		if(earliestPrizeEntered < expiredPrizeWarnThreshold) {
-			double daysToExpiration = (earliestPrizeEntered - (currentTimeMillis - prizeExpirationDays * 86400 * 1000)) / 1000.0 / 86400.0;
-			if(daysToExpiration < 0)
-				daysToExpiration = 0.0;
 
 			if(prizeCount > 1)
-				expirationMessage = String.format("Warning: Prizes will expire in %.1f days. ", daysToExpiration);
+				expirationMessage = ChatColor.RED + "Warning: " + ChatColor.GREEN + "You have prizes expiring soon!";
 			else
-				expirationMessage = String.format("Warning: Prize expires in %.1f days. ", daysToExpiration);
+				expirationMessage = ChatColor.RED + "Warning: " + ChatColor.GREEN + "Prize expires soon!";
 
+		} else {
+			expirationMessage = "";
 		}
-
-		final String formattedExpirationMessage = expirationMessage;
 
 		Runnable task = new Runnable() {
 			@Override
@@ -375,9 +372,13 @@ public class Unscramble extends Plugin implements Listener
 				if(prizeCount > 1)
 					prizeMessage = ChatColor.GOLD + Integer.toString(prizeCount) + ChatColor.GREEN + " unclaimed prizes. ";
 				else
-					prizeMessage = ChatColor.GOLD + "1" +  ChatColor.GREEN + " unclaimed prize. ";
+					prizeMessage = ChatColor.GOLD + "1" + ChatColor.GREEN + " unclaimed prize. ";
 
-				player.sendMessage(TextComponent.fromLegacyText(ChatColor.GRAY + "[Unscramble] " + ChatColor.GREEN + "You have " + prizeMessage + formattedExpirationMessage + "Claim with " + ChatColor.GOLD + "/us claim"));
+				player.sendMessage(TextComponent.fromLegacyText(ChatColor.GRAY + "[Unscramble] " + ChatColor.GREEN + "You have " + prizeMessage + "Use " + ChatColor.GOLD + "/us claim"));
+
+				if (!expirationMessage.isEmpty())
+					player.sendMessage(TextComponent.fromLegacyText(ChatColor.GRAY + "[Unscramble] " + expirationMessage));
+
 			}
 		};
 
