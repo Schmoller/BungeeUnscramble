@@ -44,9 +44,7 @@ public class Session implements Runnable
 		mHint = word.replaceAll("[^ ]", "*");
 		mHintInterval = hintInterval;
 
-		// From Bungeecord-Chat, specifically net.md_5.bungee.api.ChatColor.stripColor
-		// Updated to change COLOR_CHAR from '§' to '&'
-		STRIP_COLOR_PATTERN = Pattern.compile("(?i)&[0-9A-FK-OR]");
+		STRIP_COLOR_PATTERN = Pattern.compile("(?i)[&\u00A7][0-9A-FK-OR]");
 
 		mPrize = prize;
 		scramble();
