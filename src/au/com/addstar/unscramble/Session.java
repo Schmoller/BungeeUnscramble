@@ -3,6 +3,7 @@ package au.com.addstar.unscramble;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import au.com.addstar.unscramble.prizes.Prize;
@@ -52,7 +53,11 @@ public class Session implements Runnable
 	
 	public void start()
 	{
-		ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "New Game! Unscramble " + ChatColor.ITALIC + "this: " + ChatColor.RED + mWordScramble));
+		if (mWordScramble.length() >= 15)
+			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "New Game! Unscramble " + ChatColor.ITALIC + "this:\n" + ChatColor.RED + mWordScramble));
+		else
+			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "New Game! Unscramble " + ChatColor.ITALIC + "this: " + ChatColor.RED + mWordScramble));
+
 		if(mPrize != null)
 			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "The prize for winning is " + ChatColor.YELLOW + mPrize.getDescription()));
 		
@@ -107,8 +112,22 @@ public class Session implements Runnable
 
 		guess = STRIP_COLOR_PATTERN.matcher(guess).replaceAll("");
 
-		if(mWord.equalsIgnoreCase(guess))
-		{
+		if(mWord.equalsIgnoreCase(guess)) {
+
+			// Check for too many capital letters
+			if(guess.matches(".*[A-Z ]{10,200}.*")) {
+				ProxyServer.getInstance().getScheduler().schedule(Unscramble.instance, new Runnable()
+				{
+					@Override
+					public void run()
+					{
+					player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.YELLOW + "Answer rejected: " + ChatColor.RED + "too many caps"));
+					}
+				}, 500, TimeUnit.MILLISECONDS);
+
+				return;
+			}
+
 			mTask.cancel();
 			mTask = null;
 			
