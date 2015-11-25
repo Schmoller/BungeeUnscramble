@@ -238,10 +238,16 @@ public class UnscrambleCommand extends Command
 			{
 				try
 				{
-					time = Integer.parseInt(arg.substring(2));
+					if(arg.substring(2).endsWith("s")) {
+						// User entered something like t:30s
+						time = Integer.parseInt(arg.substring(2, arg.length() - 1));
+					} else {
+						time = Integer.parseInt(arg.substring(2));
+					}
+
 					if(time <= 0)
 					{
-						sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Time must be 1 or greater"));
+						sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Time must be 1 or greater (seconds)"));
 						return;
 					}
 					
@@ -249,7 +255,7 @@ public class UnscrambleCommand extends Command
 				}
 				catch(NumberFormatException e)
 				{
-					sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Time must be number 1 or greater"));
+					sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Time must be 1 or greater (seconds)"));
 					return;
 				}
 			}
@@ -257,10 +263,16 @@ public class UnscrambleCommand extends Command
 			{
 				try
 				{
-					hints = Integer.parseInt(arg.substring(2));
+					if(arg.substring(2).endsWith("s")) {
+						// User entered something like h:10s
+						hints = Integer.parseInt(arg.substring(2, arg.length() - 1));
+					} else {
+						hints = Integer.parseInt(arg.substring(2));
+					}
+
 					if(hints <= 0)
 					{
-						sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Hint interval must be 1 or greater"));
+						sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Hint interval must be 1 or greater (seconds)"));
 						return;
 					}
 					
@@ -268,7 +280,7 @@ public class UnscrambleCommand extends Command
 				}
 				catch(NumberFormatException e)
 				{
-					sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Hint interval must be number 1 or greater"));
+					sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Hint interval must be 1 or greater (seconds)"));
 					return;
 				}
 			}

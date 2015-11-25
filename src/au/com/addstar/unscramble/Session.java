@@ -53,10 +53,14 @@ public class Session implements Runnable
 	
 	public void start()
 	{
-		if (mWordScramble.length() >= 15)
-			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "New Game! Unscramble " + ChatColor.ITALIC + "this:\n" + ChatColor.RED + mWordScramble));
-		else
-			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "New Game! Unscramble " + ChatColor.ITALIC + "this: " + ChatColor.RED + mWordScramble));
+		String unscrambleMessage = ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "New Game! Unscramble " + ChatColor.ITALIC + "this: ";
+
+		if(mWordScramble.length() >= 15) {
+			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(unscrambleMessage));
+			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + mWordScramble));
+		} else {
+			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(unscrambleMessage + ChatColor.RED + mWordScramble));
+		}
 
 		if(mPrize != null)
 			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "The prize for winning is " + ChatColor.YELLOW + mPrize.getDescription()));

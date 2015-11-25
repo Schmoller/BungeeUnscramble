@@ -376,7 +376,7 @@ public class Unscramble extends Plugin implements Listener
 
 				player.sendMessage(TextComponent.fromLegacyText(ChatColor.GRAY + "[Unscramble] " + ChatColor.GREEN + "You have " + prizeMessage + "Use " + ChatColor.GOLD + "/us claim"));
 
-				if (!expirationMessage.isEmpty())
+				if(!expirationMessage.isEmpty())
 					player.sendMessage(TextComponent.fromLegacyText(ChatColor.GRAY + "[Unscramble] " + expirationMessage));
 
 			}
