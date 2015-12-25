@@ -143,8 +143,10 @@ public class UnscrambleCommand extends Command
 				sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + "You may not claim your prizes here. Please go to " + serverString));
 				return;
 			}
-			
-			List<SavedPrize> prizes = Unscramble.instance.getPrizes(player, true);
+
+			int MAX_PRIZES_TO_AWARD = 10;
+
+			List<SavedPrize> prizes = Unscramble.instance.getPrizes(player, true, MAX_PRIZES_TO_AWARD);
 			if(prizes == null || prizes.isEmpty())
 			{
 				sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + "No prizes found under your name."));
@@ -159,9 +161,9 @@ public class UnscrambleCommand extends Command
 			for(SavedPrize prize : prizes)
 			{
 				int session = prize.prize.award(player);
-				Unscramble.instance.startPrizeSession(session, player, prize.prize);
+				Unscramble.instance.startPrizeSession(session, player, prize.prize, prize.entered);
 
-				if(++prizesAwarded >= 10) {
+				if(++prizesAwarded >= MAX_PRIZES_TO_AWARD) {
 					if(prizesAwarded < prizes.size()) {
 
 						// More prizes remain; inform the player
@@ -177,8 +179,8 @@ public class UnscrambleCommand extends Command
 
 						Unscramble.instance.getProxy().getScheduler().schedule(Unscramble.instance, task, 2, TimeUnit.SECONDS);
 
-						break;
 					}
+					break;
 				}
 			}
 		}

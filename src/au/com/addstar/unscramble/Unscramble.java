@@ -130,7 +130,7 @@ public class Unscramble extends Plugin implements Listener
 		{
 			ProxiedPlayer player = event.getPlayer();
 
-			List<SavedPrize> prizes = getPrizes(player, false);
+			List<SavedPrize> prizes = getPrizes(player, false, 0);
 
 			if(prizes != null && !prizes.isEmpty()) {
 				NotifyPlayerUnclaimedPrizes(player, prizes);
@@ -194,11 +194,11 @@ public class Unscramble extends Plugin implements Listener
 		}
 	}
 
-	public List<SavedPrize> getPrizes(ProxiedPlayer player, boolean remove)
+	public List<SavedPrize> getPrizes(ProxiedPlayer player, boolean remove, int maxPrizesToRemove)
 	{
 		if(remove)
 		{
-			List<SavedPrize> prizes = mUnclaimed.getPrizes(player.getName(), true);
+			List<SavedPrize> prizes = mUnclaimed.getPrizes(player.getName(), true, maxPrizesToRemove);
 			try
 			{
 				mUnclaimed.save();
@@ -210,12 +210,12 @@ public class Unscramble extends Plugin implements Listener
 			return prizes;
 		}
 		else
-			return mUnclaimed.getPrizes(player.getName(), false);
+			return mUnclaimed.getPrizes(player.getName(), false, maxPrizesToRemove);
 	}
 
-	public void startPrizeSession(int sessionId, ProxiedPlayer player, Prize prize)
+	public void startPrizeSession(int sessionId, ProxiedPlayer player, Prize prize, String entered)
 	{
-		mActiveSessions.put(sessionId, new SavedPrize(player.getName(), prize));
+		mActiveSessions.put(sessionId, new SavedPrize(player.getName(), prize, entered));
 	}
 
 	public String getRandomWord()
@@ -260,7 +260,7 @@ public class Unscramble extends Plugin implements Listener
 				else if(hasMoreData == 1)
 				{
 					Entry<Prize, String> result = prize.prize.handleFail(input);
-					SavedPrize newPrize = new SavedPrize(prize.player, result.getKey());
+					SavedPrize newPrize = new SavedPrize(prize.player, result.getKey(), prize.entered);
 					mUnclaimed.prizes.add(newPrize);
 					player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + result.getValue()));
 				}
@@ -282,6 +282,7 @@ public class Unscramble extends Plugin implements Listener
 			else if(subChannel.equals("AwardOk"))
 			{
 				getProxy().getPlayer(prize.player).sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "You have been awarded " + ChatColor.YELLOW + prize.prize.getDescription()));
+				getLogger().info("Awarded prize to " + prize.player + ": " + prize.prize.getDescription());
 			}
 		}
 		catch(IOException e)

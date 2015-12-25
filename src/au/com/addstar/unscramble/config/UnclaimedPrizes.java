@@ -32,11 +32,13 @@ public class UnclaimedPrizes extends Config
 	
 	public List<SavedPrize> prizes;
 	
-	public List<SavedPrize> getPrizes(String player, boolean remove)
+	public List<SavedPrize> getPrizes(String player, boolean remove, int maxPrizesToRemove)
 	{
 		ArrayList<SavedPrize> prizes = new ArrayList<SavedPrize>();
 		Iterator<SavedPrize> it = this.prizes.iterator();
-		
+
+		int prizesRemoved = 0;
+
 		while(it.hasNext())
 		{
 			SavedPrize prize = it.next();
@@ -44,8 +46,10 @@ public class UnclaimedPrizes extends Config
 			if(prize.player.equals(player))
 			{
 				prizes.add(prize);
-				if(remove)
+				if(remove && (maxPrizesToRemove < 0 || prizesRemoved < maxPrizesToRemove)) {
 					it.remove();
+					prizesRemoved++;
+				}
 			}
 		}
 		

@@ -28,7 +28,16 @@ public class SavedPrize extends Config
 		this.prize = prize;
 		this.entered = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 	}
-	
+
+	public SavedPrize(String player, Prize prize, String entered)
+	{
+		this();
+
+		this.player = player;
+		this.prize = prize;
+		this.entered = entered;
+	}
+
 	public String player;
 	public Prize prize;
 	public String entered;
