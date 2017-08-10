@@ -15,18 +15,18 @@ import au.com.addstar.unscramble.prizes.Prize;
 import au.com.addstar.unscramble.prizes.Prizes;
 
 import net.cubespace.Yamler.Config.Comment;
-import net.cubespace.Yamler.Config.Config;
 import net.cubespace.Yamler.Config.InvalidConverterException;
 import net.cubespace.Yamler.Config.Path;
+import net.cubespace.Yamler.Config.YamlConfig;
 
-public class GameConfig extends Config
+public class GameConfig extends YamlConfig
 {
 	private static WeightedPrizeSaver mSaver = new WeightedPrizeSaver(null);
 	
 	public GameConfig()
 	{
-		wordList = new ArrayList<String>();
-		prizes = new ArrayList<WeightedPrize>();
+		wordList = new ArrayList<>();
+		prizes = new ArrayList<>();
 		prizes.add(new WeightedPrize(2, "$10"));
 		prizes.add(new WeightedPrize(1, "$20"));
 		
@@ -94,7 +94,7 @@ public class GameConfig extends Config
 		{
 			e.printStackTrace();
 		}
-		mWeightedPrizes = new ArrayList<Entry<Integer,Prize>>();
+		mWeightedPrizes = new ArrayList<>();
 		
 		mTotal = 0;
 		for(WeightedPrize prize : prizes)
@@ -110,7 +110,7 @@ public class GameConfig extends Config
 					continue;
 				}
 				
-				mWeightedPrizes.add(new AbstractMap.SimpleEntry<Integer, Prize>(mTotal, p));
+				mWeightedPrizes.add(new AbstractMap.SimpleEntry<>(mTotal, p));
 			}
 			catch(IllegalArgumentException e)
 			{
@@ -126,7 +126,7 @@ public class GameConfig extends Config
 		
 		int val = Unscramble.rand.nextInt(mTotal);
 		
-		int index = Collections.binarySearch(mWeightedPrizes, new AbstractMap.SimpleEntry<Integer, Prize>(val, null), new Comparator<Entry<Integer, Prize>>()
+		int index = Collections.binarySearch(mWeightedPrizes, new AbstractMap.SimpleEntry<>(val, null), new Comparator<Entry<Integer, Prize>>()
 		{
 			@Override
 			public int compare( Entry<Integer, Prize> o1, Entry<Integer, Prize> o2 )

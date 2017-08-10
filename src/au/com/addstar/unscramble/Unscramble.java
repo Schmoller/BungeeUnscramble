@@ -46,7 +46,7 @@ public class Unscramble extends Plugin implements Listener
 
 	private SimpleDateFormat mDateParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-	private HashMap<Integer, SavedPrize> mActiveSessions = new HashMap<Integer, SavedPrize>();
+	private HashMap<Integer, SavedPrize> mActiveSessions = new HashMap<>();
 
 	@Override
 	public void onEnable()

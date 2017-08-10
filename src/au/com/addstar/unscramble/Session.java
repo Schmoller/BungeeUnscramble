@@ -3,7 +3,6 @@ package au.com.addstar.unscramble;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import au.com.addstar.unscramble.prizes.Prize;
@@ -264,7 +263,7 @@ public class Session implements Runnable
 			if(word.length() <= 1)
 				continue;
 			
-			ArrayList<Character> chars = new ArrayList<Character>(word.length());
+			ArrayList<Character> chars = new ArrayList<>(word.length());
 			for(int c = 0; c < word.length(); ++c)
 				chars.add(word.charAt(c));
 			
@@ -273,8 +272,7 @@ public class Session implements Runnable
 				Collections.shuffle(chars, Unscramble.rand);
 				
 				StringBuilder builder = new StringBuilder(word.length());
-				for(int c = 0; c < chars.size(); ++c)
-					builder.append(chars.get(c));
+				for (Character aChar : chars) builder.append(aChar);
 				word = builder.toString();
 			}
 			

@@ -48,7 +48,7 @@ public class MoneyPrize extends Prize
 	@Override
 	public Map<String, Object> save()
 	{
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		map.put("type", "money");
 		map.put("amount", mAmount);
 		return map;

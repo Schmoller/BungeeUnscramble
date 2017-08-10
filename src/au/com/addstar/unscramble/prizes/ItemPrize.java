@@ -50,13 +50,13 @@ public class ItemPrize extends Prize
 	public Entry<Prize, String> handleFail( DataInputStream input ) throws IOException
 	{
 		int remaining = input.readInt();
-		return new AbstractMap.SimpleEntry<Prize, String>(new ItemPrize(mMaterial, mData, remaining), "Your inventory was full. Please clear space then try again");
+		return new AbstractMap.SimpleEntry<>(new ItemPrize(mMaterial, mData, remaining), "Your inventory was full. Please clear space then try again");
 	}
 
 	@Override
 	public Map<String, Object> save()
 	{
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		map.put("type", "item");
 		map.put("material", mMaterial);
 		map.put("data", mData);

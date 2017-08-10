@@ -49,7 +49,7 @@ public class WeightedPrizeSaver implements Converter
 	{
 		WeightedPrize prize = (WeightedPrize)obj;
 		
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		map.put(String.valueOf(prize.weight), prize.prize);
 		
 		return map;

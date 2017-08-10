@@ -19,10 +19,7 @@ public class AutoGameStarter implements Runnable
 	
 	private boolean canRun()
 	{
-		if(ProxyServer.getInstance().getOnlineCount() >= mMinPlayers)
-			return true;
-		else
-			return false;
+		return ProxyServer.getInstance().getOnlineCount() >= mMinPlayers;
 	}
 	
 	@Override

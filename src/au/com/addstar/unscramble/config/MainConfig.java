@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.cubespace.Yamler.Config.Comment;
-import net.cubespace.Yamler.Config.Config;
 import net.cubespace.Yamler.Config.Path;
+import net.cubespace.Yamler.Config.YamlConfig;
 
-public class MainConfig extends Config
+public class MainConfig extends YamlConfig
 {
 	public MainConfig(File file)
 	{
@@ -16,7 +16,7 @@ public class MainConfig extends Config
 	}
 	
 	@Path("random-words")
-	public List<String> words = new ArrayList<String>();
+	public List<String> words = new ArrayList<>();
 	
 	@Path("display-answer-on-failed-games")
 	public boolean displayAnswer = true;
@@ -34,5 +34,5 @@ public class MainConfig extends Config
 
 	@Path("claim-servers")
 	@Comment("The names of servers players may claim their rewards on")
-	public List<String> claimServers = new ArrayList<String>();
+	public List<String> claimServers = new ArrayList<>();
 }
