@@ -12,6 +12,7 @@
     <build.number />
     <plugin.version>${project.version}-${build.number}</plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <bungee.version>1.12-SNAPSHOT</bungee.version>
   </properties>
   <scm>
     <connection>scm:git:git@github.com:AddstarMC/BungeeUnscramble.git</connection>
@@ -74,7 +75,7 @@
     <dependency>
         <groupId>net.md-5</groupId>
         <artifactId>bungeecord-api</artifactId>
-        <version>1.12-SNAPSHOT</version>
+        <version>${bungee.version}</version>
     	<type>jar</type>
   	</dependency>
   	
