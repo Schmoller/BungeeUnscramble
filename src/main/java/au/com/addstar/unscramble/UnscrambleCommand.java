@@ -14,7 +14,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
-public class UnscrambleCommand extends Command
+class UnscrambleCommand extends Command
 {
 	public UnscrambleCommand()
 	{
@@ -121,7 +121,7 @@ public class UnscrambleCommand extends Command
 			List<String> claimServers = Unscramble.instance.getConfig().claimServers;
 			if(!claimServers.isEmpty() && !claimServers.contains(player.getServer().getInfo().getName()))
 			{
-				String serverString = "";
+				StringBuilder serverString = new StringBuilder();
 				for(int i = 0; i < claimServers.size(); ++i)
 				{
 					String server = claimServers.get(i);
@@ -129,16 +129,16 @@ public class UnscrambleCommand extends Command
 					if(i != 0)
 					{
 						if(i != claimServers.size()-1)
-							serverString += ", ";
+							serverString.append(", ");
 						else
-							serverString += " or ";
+							serverString.append(" or ");
 					}
 					
-					serverString += server;
+					serverString.append(server);
 				}
 				
 				if(claimServers.size() > 1)
-					serverString = "either " + serverString;
+					serverString.insert(0, "either ");
 					
 				sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + "You may not claim your prizes here. Please go to " + serverString));
 				return;
@@ -169,13 +169,7 @@ public class UnscrambleCommand extends Command
 						// More prizes remain; inform the player
 						// Using a 2 second delay to prevent the message from appearing before the messages regarding awarded prizes
 
-						Runnable task = new Runnable() {
-							@Override
-							public void run() {
-
-								player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "You have more prizes to claim. Make sure you have free inventory space then use " + ChatColor.GOLD + "/us claim" + ChatColor.DARK_AQUA + " again"));
-							}
-						};
+						Runnable task = () -> player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "You have more prizes to claim. Make sure you have free inventory space then use " + ChatColor.GOLD + "/us claim" + ChatColor.DARK_AQUA + " again"));
 
 						Unscramble.instance.getProxy().getScheduler().schedule(Unscramble.instance, task, 2, TimeUnit.SECONDS);
 
@@ -288,17 +282,17 @@ public class UnscrambleCommand extends Command
 			}
 			else
 			{
-				String prizeString = "";
+				StringBuilder prizeString = new StringBuilder();
 				for(int j = i; j < args.length; ++j)
 				{
-					if(!prizeString.isEmpty())
-						prizeString += " ";
-					prizeString += args[j];
+					if(prizeString.length() > 0)
+						prizeString.append(" ");
+					prizeString.append(args[j]);
 				}
 				
 				try
 				{
-					prize = Prizes.parse(prizeString);
+					prize = Prizes.parse(prizeString.toString());
 					if(prize == null)
 					{
 						sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Cannot create prize from '" + prizeString + "'. Please check your typing."));

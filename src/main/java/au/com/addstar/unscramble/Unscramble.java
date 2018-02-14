@@ -34,7 +34,7 @@ import net.md_5.bungee.event.EventHandler;
 
 public class Unscramble extends Plugin implements Listener
 {
-	public static Random rand = new Random();
+	public static final Random rand = new Random();
 	public static Unscramble instance;
 
 	private Session mCurrentSession = null;
@@ -44,9 +44,9 @@ public class Unscramble extends Plugin implements Listener
 
 	private UnclaimedPrizes mUnclaimed;
 
-	private SimpleDateFormat mDateParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private final SimpleDateFormat mDateParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-	private HashMap<Integer, SavedPrize> mActiveSessions = new HashMap<>();
+	private final HashMap<Integer, SavedPrize> mActiveSessions = new HashMap<>();
 
 	@Override
 	public void onEnable()
@@ -251,23 +251,22 @@ public class Unscramble extends Plugin implements Listener
 			if(subChannel.equals("AwardFail"))
 			{
 				byte hasMoreData = input.readByte();
-				if(hasMoreData == 2)
-				{
-					mUnclaimed.prizes.add(prize);
-					player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + "An unknown error occured giving you your prizes. Please notify an admin"));
-					getLogger().severe("Could not award prize: " + prize.prize.getDescription() + " (" + prize.prize.getClass().getSimpleName() + "). It was rejected by '" + player.getServer().getInfo().getName() + "'. Check that this type is handled by that server.");
-				}
-				else if(hasMoreData == 1)
-				{
-					Entry<Prize, String> result = prize.prize.handleFail(input);
-					SavedPrize newPrize = new SavedPrize(prize.player, result.getKey(), prize.entered);
-					mUnclaimed.prizes.add(newPrize);
-					player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + result.getValue()));
-				}
-				else
-				{
-					mUnclaimed.prizes.add(prize);
-					player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + "You can not claim the prize " + prize.prize.getDescription() + " in this location."));
+				switch (hasMoreData) {
+					case 2:
+						mUnclaimed.prizes.add(prize);
+						player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + "An unknown error occured giving you your prizes. Please notify an admin"));
+						getLogger().severe("Could not award prize: " + prize.prize.getDescription() + " (" + prize.prize.getClass().getSimpleName() + "). It was rejected by '" + player.getServer().getInfo().getName() + "'. Check that this type is handled by that server.");
+						break;
+					case 1:
+						Entry<Prize, String> result = prize.prize.handleFail(input);
+						SavedPrize newPrize = new SavedPrize(prize.player, result.getKey(), prize.entered);
+						mUnclaimed.prizes.add(newPrize);
+						player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + result.getValue()));
+						break;
+					default:
+						mUnclaimed.prizes.add(prize);
+						player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + "You can not claim the prize " + prize.prize.getDescription() + " in this location."));
+						break;
 				}
 
 				try
@@ -285,7 +284,7 @@ public class Unscramble extends Plugin implements Listener
 				getLogger().info("Awarded prize to " + prize.player + ": " + prize.prize.getDescription());
 			}
 		}
-		catch(IOException e)
+		catch(IOException ignored)
 		{
 		}
 	}
@@ -293,8 +292,7 @@ public class Unscramble extends Plugin implements Listener
 	private Date ParseDate(String dateValue) {
 
 		try {
-			Date parsedDate = mDateParser.parse(dateValue);
-			return parsedDate;
+			return mDateParser.parse(dateValue);
 
 		} catch (ParseException ex) {
 			return null;
@@ -364,29 +362,26 @@ public class Unscramble extends Plugin implements Listener
 			expirationMessage = "";
 		}
 
-		Runnable task = new Runnable() {
-			@Override
-			public void run() {
+		Runnable task = () -> {
 
-				String prizeMessage;
+            String prizeMessage;
 
-				if(prizeCount > 1)
-					prizeMessage = ChatColor.GOLD + Integer.toString(prizeCount) + ChatColor.GREEN + " unclaimed prizes. ";
-				else
-					prizeMessage = ChatColor.GOLD + "1" + ChatColor.GREEN + " unclaimed prize. ";
+            if(prizeCount > 1)
+                prizeMessage = ChatColor.GOLD + Integer.toString(prizeCount) + ChatColor.GREEN + " unclaimed prizes. ";
+            else
+                prizeMessage = ChatColor.GOLD + "1" + ChatColor.GREEN + " unclaimed prize. ";
 
-				player.sendMessage(TextComponent.fromLegacyText(ChatColor.GRAY + "[Unscramble] " + ChatColor.GREEN + "You have " + prizeMessage + "Use " + ChatColor.GOLD + "/us claim"));
+            player.sendMessage(TextComponent.fromLegacyText(ChatColor.GRAY + "[Unscramble] " + ChatColor.GREEN + "You have " + prizeMessage + "Use " + ChatColor.GOLD + "/us claim"));
 
-				if(!expirationMessage.isEmpty())
-					player.sendMessage(TextComponent.fromLegacyText(ChatColor.GRAY + "[Unscramble] " + expirationMessage));
+            if(!expirationMessage.isEmpty())
+                player.sendMessage(TextComponent.fromLegacyText(ChatColor.GRAY + "[Unscramble] " + expirationMessage));
 
-			}
-		};
+        };
 
 		getProxy().getScheduler().schedule(this, task, 5, TimeUnit.SECONDS);
 	}
 
-	public void removeExpiredPrizes()
+	private void removeExpiredPrizes()
 	{
 
 		try

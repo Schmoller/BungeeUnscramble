@@ -15,23 +15,23 @@ import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 public class Session implements Runnable
 {
-	private String mWord;
+	private final String mWord;
 	private String mWordScramble;
 	
-	private long mEndTime;
+	private final long mEndTime;
 	private long mLastAnnounce;
 	
 	private String mHint;
-	private long mHintInterval;
+	private final long mHintInterval;
 	private long mLastHint;
 	
-	private Prize mPrize;
+	private final Prize mPrize;
 	
 	private ScheduledTask mTask;
 	
 	private int mChatLines = 0;
 
-	private Pattern STRIP_COLOR_PATTERN;
+	private final Pattern STRIP_COLOR_PATTERN;
 
 	public Session(String word, long duration, long hintInterval, Prize prize)
 	{
@@ -103,7 +103,7 @@ public class Session implements Runnable
 		ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Hint!... " + mHint));
 	}
 	
-	public boolean isRunning()
+	private boolean isRunning()
 	{
 		return mTask != null;
 	}
@@ -119,14 +119,7 @@ public class Session implements Runnable
 
 			// Check for too many capital letters
 			if(guess.matches(".*[A-Z ]{10,200}.*")) {
-				ProxyServer.getInstance().getScheduler().schedule(Unscramble.instance, new Runnable()
-				{
-					@Override
-					public void run()
-					{
-					player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.YELLOW + "Answer rejected: " + ChatColor.RED + "too many caps"));
-					}
-				}, 500, TimeUnit.MILLISECONDS);
+				ProxyServer.getInstance().getScheduler().schedule(Unscramble.instance, () -> player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.YELLOW + "Answer rejected: " + ChatColor.RED + "too many caps")), 500, TimeUnit.MILLISECONDS);
 
 				return;
 			}
@@ -139,16 +132,11 @@ public class Session implements Runnable
 			
 			Unscramble.instance.onSessionFinish();
 			
-			ProxyServer.getInstance().getScheduler().schedule(Unscramble.instance, new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Congratulations " + ChatColor.stripColor(player.getDisplayName()) + "!"));
-					if(mPrize != null)
-						player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Use " + ChatColor.RED + "/us claim" + ChatColor.DARK_AQUA + " to claim your prize!"));
-				}
-			}, 200, TimeUnit.MILLISECONDS);
+			ProxyServer.getInstance().getScheduler().schedule(Unscramble.instance, () -> {
+                ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Congratulations " + ChatColor.stripColor(player.getDisplayName()) + "!"));
+                if(mPrize != null)
+                    player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Use " + ChatColor.RED + "/us claim" + ChatColor.DARK_AQUA + " to claim your prize!"));
+            }, 200, TimeUnit.MILLISECONDS);
 		}
 		else
 		{
@@ -207,17 +195,17 @@ public class Session implements Runnable
 		}
 	}
 	
-	public long getTimeLeft()
+	private long getTimeLeft()
 	{
 		return mEndTime - System.currentTimeMillis();
 	}
 	
-	public String getTimeLeftString()
+	private String getTimeLeftString()
 	{
 		long time = getTimeLeft();
 		time = (long)Math.ceil(time / 1000D) * 1000;
 		
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		
 		long minutes = TimeUnit.MINUTES.convert(time, TimeUnit.MILLISECONDS);
 		if(minutes > 0)

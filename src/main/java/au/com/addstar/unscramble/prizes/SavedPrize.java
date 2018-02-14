@@ -8,7 +8,7 @@ import java.util.Date;
 
 public class SavedPrize extends YamlConfig
 {
-	public SavedPrize()
+	private SavedPrize()
 	{
 		try
 		{

@@ -16,23 +16,23 @@ public class MainConfig extends YamlConfig
 	}
 	
 	@Path("random-words")
-	public List<String> words = new ArrayList<>();
+	public final List<String> words = new ArrayList<>();
 	
 	@Path("display-answer-on-failed-games")
-	public boolean displayAnswer = true;
+	public final boolean displayAnswer = true;
 	
 	@Path("auto-game-enabled")
-	public boolean autoGameEnabled = false;
+	public final boolean autoGameEnabled = false;
 
 	@Path("expiring-prize-warning-days")
 	@Comment("The time threshold for warning players of expiring prizes")
-	public int expiringPrizeWarningDays = 5;
+	public final int expiringPrizeWarningDays = 5;
 
 	@Path("prize-expiration-days")
 	@Comment("Unclaimed prizes more than this number of days old are deleted")
-	public int prizeExpirationDays = 28;
+	public final int prizeExpirationDays = 28;
 
 	@Path("claim-servers")
 	@Comment("The names of servers players may claim their rewards on")
-	public List<String> claimServers = new ArrayList<>();
+	public final List<String> claimServers = new ArrayList<>();
 }

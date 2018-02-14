@@ -1,6 +1,6 @@
 package au.com.addstar.unscramble.config;
 
-public class WeightedPrize
+class WeightedPrize
 {
 	public WeightedPrize(int weight, String prize)
 	{

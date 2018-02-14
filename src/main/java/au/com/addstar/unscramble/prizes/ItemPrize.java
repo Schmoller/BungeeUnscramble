@@ -13,9 +13,9 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class ItemPrize extends Prize
 {
-	private String mMaterial;
-	private int mData;
-	private int mCount;
+	private final String mMaterial;
+	private final int mData;
+	private final int mCount;
 	
 	public ItemPrize(String material, int data, int count)
 	{

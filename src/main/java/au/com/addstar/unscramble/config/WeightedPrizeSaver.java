@@ -8,18 +8,17 @@ import java.util.Map.Entry;
 import net.cubespace.Yamler.Config.InternalConverter;
 import net.cubespace.Yamler.Config.Converter.Converter;
 
-public class WeightedPrizeSaver implements Converter
+class WeightedPrizeSaver implements Converter
 {
 	public WeightedPrizeSaver(InternalConverter converter)
 	{
 	}
 	
 	@Override
-	public Object fromConfig( Class<?> clazz, Object obj, ParameterizedType type ) throws Exception
-	{
+	public Object fromConfig( Class<?> clazz, Object obj, ParameterizedType type ) {
 		if((obj instanceof WeightedPrize))
 		{
-			return (WeightedPrize)obj;
+			return obj;
 		}
 
 		if(!(obj instanceof Map))
@@ -45,8 +44,7 @@ public class WeightedPrizeSaver implements Converter
 	}
 
 	@Override
-	public Object toConfig( Class<?> clazz, Object obj, ParameterizedType type ) throws Exception
-	{
+	public Object toConfig( Class<?> clazz, Object obj, ParameterizedType type ) {
 		WeightedPrize prize = (WeightedPrize)obj;
 		
 		HashMap<String, Object> map = new HashMap<>();

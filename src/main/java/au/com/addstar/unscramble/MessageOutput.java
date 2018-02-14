@@ -9,9 +9,9 @@ import net.md_5.bungee.api.config.ServerInfo;
 
 public class MessageOutput
 {
-	private ByteArrayOutputStream mStream;
-	private DataOutputStream mOutput;
-	private String mChannel;
+	private final ByteArrayOutputStream mStream;
+	private final DataOutputStream mOutput;
+	private final String mChannel;
 	
 	public MessageOutput(String channel, String subChannel)
 	{
@@ -23,7 +23,7 @@ public class MessageOutput
 		{
 			mOutput.writeUTF(subChannel);
 		}
-		catch(IOException e)
+		catch(IOException ignored)
 		{
 		}
 	}
@@ -33,7 +33,7 @@ public class MessageOutput
 		{
 			mOutput.write(b);
 		}
-		catch(IOException e)
+		catch(IOException ignored)
 		{
 		}
 		
@@ -46,7 +46,7 @@ public class MessageOutput
 		{
 			mOutput.write(b);
 		}
-		catch(IOException e)
+		catch(IOException ignored)
 		{
 		}
 		
@@ -59,7 +59,7 @@ public class MessageOutput
 		{
 			mOutput.write(b, off, len);
 		}
-		catch(IOException e)
+		catch(IOException ignored)
 		{
 		}
 		
@@ -72,7 +72,7 @@ public class MessageOutput
 		{
 			mOutput.writeBoolean(v);
 		}
-		catch(IOException e)
+		catch(IOException ignored)
 		{
 		}
 		
@@ -85,7 +85,7 @@ public class MessageOutput
 		{
 			mOutput.writeByte(v);
 		}
-		catch(IOException e)
+		catch(IOException ignored)
 		{
 		}
 		
@@ -98,7 +98,7 @@ public class MessageOutput
 		{
 			mOutput.writeShort(v);
 		}
-		catch(IOException e)
+		catch(IOException ignored)
 		{
 		}
 		
@@ -111,7 +111,7 @@ public class MessageOutput
 		{
 			mOutput.writeChar(v);
 		}
-		catch(IOException e)
+		catch(IOException ignored)
 		{
 		}
 		
@@ -124,7 +124,7 @@ public class MessageOutput
 		{
 			mOutput.writeInt(v);
 		}
-		catch(IOException e)
+		catch(IOException ignored)
 		{
 		}
 		
@@ -137,7 +137,7 @@ public class MessageOutput
 		{
 			mOutput.writeLong(v);
 		}
-		catch(IOException e)
+		catch(IOException ignored)
 		{
 		}
 		
@@ -150,7 +150,7 @@ public class MessageOutput
 		{
 			mOutput.writeFloat(v);
 		}
-		catch(IOException e)
+		catch(IOException ignored)
 		{
 		}
 		
@@ -163,7 +163,7 @@ public class MessageOutput
 		{
 			mOutput.writeDouble(v);
 		}
-		catch(IOException e)
+		catch(IOException ignored)
 		{
 		}
 		
@@ -176,7 +176,7 @@ public class MessageOutput
 		{
 			mOutput.writeBytes(s);
 		}
-		catch(IOException e)
+		catch(IOException ignored)
 		{
 		}
 		
@@ -189,7 +189,7 @@ public class MessageOutput
 		{
 			mOutput.writeChars(s);
 		}
-		catch(IOException e)
+		catch(IOException ignored)
 		{
 		}
 		
@@ -202,7 +202,7 @@ public class MessageOutput
 		{
 			mOutput.writeUTF(s);
 		}
-		catch(IOException e)
+		catch(IOException ignored)
 		{
 		}
 		

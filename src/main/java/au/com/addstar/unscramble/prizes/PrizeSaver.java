@@ -13,8 +13,7 @@ public class PrizeSaver implements Converter
 	}
 	
 	@Override
-	public Object fromConfig( Class<?> clazz, Object obj, ParameterizedType type ) throws Exception
-	{
+	public Object fromConfig( Class<?> clazz, Object obj, ParameterizedType type ) {
 		if(!(obj instanceof Map))
 			return null;
 		
@@ -31,8 +30,7 @@ public class PrizeSaver implements Converter
 	}
 
 	@Override
-	public Object toConfig( Class<?> clazz, Object obj, ParameterizedType type ) throws Exception
-	{
+	public Object toConfig( Class<?> clazz, Object obj, ParameterizedType type ) {
 		if(!(obj instanceof Prize))
 			return null;
 		

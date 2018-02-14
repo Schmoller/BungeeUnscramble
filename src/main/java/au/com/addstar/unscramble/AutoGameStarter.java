@@ -6,10 +6,10 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 
-public class AutoGameStarter implements Runnable
+class AutoGameStarter implements Runnable
 {
-	private int mWarning;
-	private int mMinPlayers;
+	private final int mWarning;
+	private final int mMinPlayers;
 	
 	public AutoGameStarter(int warningTime, int minPlayers)
 	{
@@ -33,16 +33,11 @@ public class AutoGameStarter implements Runnable
 		else
 		{
 			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.YELLOW + "A game of unscramble is about to start!"));
-			ProxyServer.getInstance().getScheduler().schedule(Unscramble.instance, new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					if(!canRun())
-						return;
-					Unscramble.instance.startAutoGame();
-				}
-			}, mWarning, TimeUnit.SECONDS);
+			ProxyServer.getInstance().getScheduler().schedule(Unscramble.instance, () -> {
+                if(!canRun())
+                    return;
+                Unscramble.instance.startAutoGame();
+            }, mWarning, TimeUnit.SECONDS);
 		}
 	}
 }

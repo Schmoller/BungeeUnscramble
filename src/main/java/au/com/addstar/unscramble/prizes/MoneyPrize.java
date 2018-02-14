@@ -1,7 +1,6 @@
 package au.com.addstar.unscramble.prizes;
 
 import java.io.DataInputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -12,7 +11,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class MoneyPrize extends Prize
 {
-	private double mAmount;
+	private final double mAmount;
 	
 	public MoneyPrize(double amount)
 	{
@@ -39,8 +38,7 @@ public class MoneyPrize extends Prize
 	}
 	
 	@Override
-	public Entry<Prize, String> handleFail( DataInputStream input ) throws IOException
-	{
+	public Entry<Prize, String> handleFail( DataInputStream input ) {
 		// Doesnt happen
 		return null;
 	}

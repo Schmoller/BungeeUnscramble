@@ -9,7 +9,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public abstract class Prize
 {
-	public static int nextSession = 0;
+	static int nextSession = 0;
 	
 	public abstract String getDescription();
 	public abstract int award(ProxiedPlayer player);
