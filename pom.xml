@@ -90,14 +90,14 @@
       <resource>
         <targetPath>.</targetPath>
         <filtering>true</filtering>
-        <directory>${basedir}/.</directory>
+        <directory>${basedir}/src/main/resources</directory>
         <includes>
           <include>plugin.yml</include>
         </includes>
       </resource>
     </resources>
 
-    <sourceDirectory>src</sourceDirectory>
+    <sourceDirectory>src/main/java</sourceDirectory>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
