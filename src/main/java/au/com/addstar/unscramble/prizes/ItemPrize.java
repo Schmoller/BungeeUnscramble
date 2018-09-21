@@ -35,7 +35,7 @@ public class ItemPrize extends Prize
 	public int award( ProxiedPlayer player )
 	{
 		int session = nextSession++;
-		new MessageOutput("Unscramble", "AwardItem")
+		new MessageOutput("bungee:unscramble", "AwardItem")
 			.writeInt(session)
 			.writeUTF(player.getName())
 			.writeUTF(mMaterial)

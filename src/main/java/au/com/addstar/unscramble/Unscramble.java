@@ -37,7 +37,7 @@ public class Unscramble extends Plugin implements Listener
 	public static final Random rand = new Random();
 	public static Unscramble instance;
 
-	private Session mCurrentSession = null;
+	private au.com.addstar.unscramble.Session mCurrentSession = null;
 	private GameConfig mAutoGame;
 	private ScheduledTask mAutoGameTask;
 	private MainConfig mConfig;
@@ -55,9 +55,9 @@ public class Unscramble extends Plugin implements Listener
 
 		getDataFolder().mkdirs();
 
-		getProxy().getPluginManager().registerCommand(this, new UnscrambleCommand());
+		getProxy().getPluginManager().registerCommand(this, new au.com.addstar.unscramble.UnscrambleCommand());
 		getProxy().getPluginManager().registerListener(this, this);
-		getProxy().registerChannel("Unscramble");
+		getProxy().registerChannel("bungee:unscramble");
 
 		mConfig = new MainConfig(new File(getDataFolder(), "config.yml"));
 		mUnclaimed = new UnclaimedPrizes(new File(getDataFolder(), "unclaimed.yml"));
@@ -85,7 +85,7 @@ public class Unscramble extends Plugin implements Listener
 			if(mConfig.autoGameEnabled)
 			{
 				getLogger().info("Starting AutoGame timer. Will only run with at least " + mAutoGame.minPlayers + " players online.");
-				mAutoGameTask = getProxy().getScheduler().schedule(this, new AutoGameStarter(mAutoGame.warningPeriod, mAutoGame.minPlayers), mAutoGame.interval, mAutoGame.interval, TimeUnit.MINUTES);
+				mAutoGameTask = getProxy().getScheduler().schedule(this, new au.com.addstar.unscramble.AutoGameStarter(mAutoGame.warningPeriod, mAutoGame.minPlayers), mAutoGame.interval, mAutoGame.interval, TimeUnit.MINUTES);
 			}
 		}
 		catch(InvalidConfigurationException e)
@@ -149,7 +149,7 @@ public class Unscramble extends Plugin implements Listener
 		if(mCurrentSession != null)
 			throw new IllegalStateException("Session in progress");
 
-		Session session = new Session(word, length, hintInterval, prize);
+		au.com.addstar.unscramble.Session session = new au.com.addstar.unscramble.Session(word, length, hintInterval, prize);
 		session.start();
 		mCurrentSession = session;
 	}
@@ -159,7 +159,7 @@ public class Unscramble extends Plugin implements Listener
 		if(mAutoGame == null || mCurrentSession != null)
 			return;
 
-		Session session = mAutoGame.newSession();
+		au.com.addstar.unscramble.Session session = mAutoGame.newSession();
 		if(session == null)
 			return;
 
@@ -167,7 +167,7 @@ public class Unscramble extends Plugin implements Listener
 		mCurrentSession = session;
 	}
 
-	public Session getSession()
+	public au.com.addstar.unscramble.Session getSession()
 	{
 		return mCurrentSession;
 	}
