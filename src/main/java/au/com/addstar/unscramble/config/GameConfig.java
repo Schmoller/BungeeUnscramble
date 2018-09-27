@@ -19,7 +19,7 @@ import net.cubespace.Yamler.Config.InvalidConverterException;
 import net.cubespace.Yamler.Config.Path;
 import net.cubespace.Yamler.Config.YamlConfig;
 
-public class GameConfig extends YamlConfig
+public class  GameConfig extends YamlConfig
 {
 	private static final WeightedPrizeSaver mSaver = new WeightedPrizeSaver(null);
 	
@@ -121,14 +121,7 @@ public class GameConfig extends YamlConfig
 		
 		int val = Unscramble.rand.nextInt(mTotal);
 		
-		int index = Collections.binarySearch(mWeightedPrizes, new AbstractMap.SimpleEntry<>(val, null), new Comparator<Entry<Integer, Prize>>()
-		{
-			@Override
-			public int compare( Entry<Integer, Prize> o1, Entry<Integer, Prize> o2 )
-			{
-				return o1.getKey().compareTo(o2.getKey());
-			}
-		});
+		int index = Collections.binarySearch(mWeightedPrizes, new AbstractMap.SimpleEntry<>(val, null), Comparator.comparing(Entry::getKey));
 		
 		if(index < 0)
 			index = (index + 1) * -1;

@@ -13,9 +13,9 @@ public class MessageOutput
 	private final DataOutputStream mOutput;
 	private final String mChannel;
 	
-	public MessageOutput(String channel, String subChannel)
+	public MessageOutput(String subChannel)
 	{
-		mChannel = channel;
+		mChannel = Unscramble.channelName;
 		mStream = new ByteArrayOutputStream();
 		mOutput = new DataOutputStream(mStream);
 		

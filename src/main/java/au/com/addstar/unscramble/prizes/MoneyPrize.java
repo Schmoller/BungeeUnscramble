@@ -28,7 +28,7 @@ public class MoneyPrize extends Prize
 	public int award( ProxiedPlayer player )
 	{
 		int session = nextSession++;
-		new MessageOutput("Unscramble", "Award$")
+		new MessageOutput( "Award$")
 			.writeInt(session)
 			.writeUTF(player.getName())
 			.writeDouble(mAmount)

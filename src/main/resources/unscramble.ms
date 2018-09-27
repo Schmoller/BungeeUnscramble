@@ -1,5 +1,5 @@
 
-register_channel('Unscramble')
+register_channel('bungee:unscramble')
 
 proc(_us_award_item, @sessionId, @playerName, @material, @data, @count,
     assign(@remain, pgive_item(@playerName, concat(data_values(@material),':', @data), @count))
@@ -10,14 +10,14 @@ proc(_us_award_item, @sessionId, @playerName, @material, @data, @count,
         ba_put_byte(@ba, 1)
         ba_put_int(@ba, @remain)
         
-        send_plugin_message('Unscramble', @ba)
+        send_plugin_message('bungee:unscramble', @ba)
     }
     else {
         assign(@ba, byte_array())
         ba_put_string(@ba, 'AwardOk')
         ba_put_int(@ba, @sessionId)
         
-        send_plugin_message('Unscramble', @ba)
+        send_plugin_message('bungee:unscramble', @ba)
     }
 )
 
@@ -31,7 +31,7 @@ proc(_us_award_money, @sessionId, @playerName, @amount,
     send_plugin_message('Unscramble', @ba)
 )
 
-bind('plugin_message_received', null, array(channel:'Unscramble'), @event,
+bind('plugin_message_received', null, array(channel:'bungee:unscramble'), @event,
     assign(@ba, @event['bytes'])
     ba_rewind(@ba)
     
@@ -50,6 +50,6 @@ bind('plugin_message_received', null, array(channel:'Unscramble'), @event,
         ba_put_int(@ba, @sessionId)
         ba_put_byte(@ba, 2)
         
-        send_plugin_message('Unscramble', @ba)
+        send_plugin_message('bungee:unscramble', @ba)
     }
 )

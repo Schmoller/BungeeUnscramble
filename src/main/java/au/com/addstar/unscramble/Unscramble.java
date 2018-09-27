@@ -41,6 +41,7 @@ public class Unscramble extends Plugin implements Listener
 	private GameConfig mAutoGame;
 	private ScheduledTask mAutoGameTask;
 	private MainConfig mConfig;
+	public static final String channelName = "bungee:unscramble";
 
 	private UnclaimedPrizes mUnclaimed;
 
@@ -52,12 +53,12 @@ public class Unscramble extends Plugin implements Listener
 	public void onEnable()
 	{
 		instance = this;
-
-		getDataFolder().mkdirs();
+		if(!getDataFolder().exists()||!getDataFolder().mkdirs())getLogger().warning("Could not " +
+				"create Data Dir!!!");
 
 		getProxy().getPluginManager().registerCommand(this, new UnscrambleCommand());
 		getProxy().getPluginManager().registerListener(this, this);
-		getProxy().registerChannel("Unscramble");
+		getProxy().registerChannel(channelName);
 
 		mConfig = new MainConfig(new File(getDataFolder(), "config.yml"));
 		mUnclaimed = new UnclaimedPrizes(new File(getDataFolder(), "unclaimed.yml"));
@@ -126,7 +127,7 @@ public class Unscramble extends Plugin implements Listener
 	@EventHandler
 	public void onPostLogin(PostLoginEvent event) {
 
-		if(event.getPlayer() instanceof ProxiedPlayer)
+		if(event.getPlayer() != null)
 		{
 			ProxiedPlayer player = event.getPlayer();
 
