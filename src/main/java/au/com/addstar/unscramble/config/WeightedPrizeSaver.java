@@ -20,7 +20,7 @@ public class WeightedPrizeSaver implements Converter {
 	public Object fromConfig( Class<?> clazz, Object obj, ParameterizedType type ) {
 		if((obj instanceof WeightedPrize))
 		{
-			return obj;
+			return (WeightedPrize) obj;
 		}
 
 		if(!(obj instanceof Map))

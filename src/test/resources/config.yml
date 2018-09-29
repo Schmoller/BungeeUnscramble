@@ -7,6 +7,7 @@ expiring-prize-warning-days: 5
 # The names of servers players may claim their rewards on
 claim-servers:
 - survival
+- hub
 random-words:
 ########################################
 ######         Staff Names        ######
