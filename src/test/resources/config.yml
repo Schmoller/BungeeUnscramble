@@ -1,0 +1,534 @@
+display-answer-on-failed-games: true
+auto-game-enabled: true
+# Unclaimed prizes more than this number of days old are deleted
+prize-expiration-days: 21
+# The time threshold for warning players of expiring prizes
+expiring-prize-warning-days: 5
+# The names of servers players may claim their rewards on
+claim-servers:
+- survival
+random-words:
+########################################
+######         Staff Names        ######
+########################################
+- absorption health boost
+- acacia door
+- acacia sapling
+- acacia wood planks
+- acacia wood stairs
+- achievements
+- activator rail
+- active mob spawner
+- addstar mc
+- administrator
+- allium
+- ancient skull
+- andesite
+- arcing fireball
+- arrow of harming
+- automated brewing stand
+- awkward potion
+- baby zombie
+- bane of arthropods
+- beacon walls
+- bedrock
+- beef cooked medium rare
+- beetroot soup
+- biomes
+- blacksmith anvil
+- blast protection
+- blaze powder
+- blaze rod
+- blazing arrow
+- blazing hot sand
+- blue orchid
+- blue shulker box
+- boaty mcboatface
+- boiling cauldron
+- bone block
+- book and quill
+- bouncy castle
+- bountiful crops
+- broken stone shovel
+- brown button mushroom
+- brown dirt
+- bubbling potion
+- budding potato
+- build tools
+- building brick
+- burning coal
+- burning furnace
+- cake is a lie
+- calcium carbonate
+- capture the flag
+- carbon fiber fishing rod
+- carrot on a stick
+- carved jack o lantern
+- carved pumpkin
+- cave spider
+- central spawn
+- chained iron door
+- chainmail boots
+- chainmail chestplate
+- chainmail helmet
+- chainmail leggings
+- challenges
+- cheese lovers pizza
+- chirp
+- chiseled quartz block
+- chiseled red sandstone
+- chiseled stone bricks
+- chocolate chip cookie
+- chocolate milk bucket
+- chorus flower
+- chorus plant
+- chunks
+- clay brick
+- clownfish
+- clucking chicken
+- clumsy stone sword
+- coal ore vein
+- cobblestone stairs
+- cobblestone walkway
+- cobweb
+- cold biome stray
+- colour madness
+- colour my world
+- compass direction
+- competition world
+- concrete
+- concrete powder
+- corkscrew roller coaster
+- cracked stone bricks
+- create my world
+- creative plots
+- creeping vines
+- crispy bacon
+- crooked stick
+- crowd control barrier
+- crystal clear glass
+- curse of binding
+- curse of vanishing
+- cyan glazed terracotta
+- dadjokes
+- damaged gold chestplate
+- dangerous viscous lava
+- dark oak door
+- dark oak stairs
+- daylight sensor
+- dead bush
+- decorated diamond leggings
+- decoration blocks
+- delicious cake
+- dense roofed forest
+- detector rail
+- diamond block
+- diamond chestplate
+- diamond helmet visor
+- diamond horse armour
+- diamond pickaxe
+- diorite
+- dispenser
+- donator
+- dragons breath
+- dropper
+- efficient diamond shovel
+- elder guardian
+- electrified powered rail
+- elytra
+- emerald block
+- emerald city
+- enchanted book of black magic
+- enchanted golden apple
+- enchantment table
+- end cities
+- end crystal
+- end stone bricks
+- ender chest
+- ender pearl fall damage
+- ender portal
+- enderdragon
+- enderman
+- endermite
+- enormous leaves
+- ergonomic diamond hoe
+- evoker
+- expand my world
+- extension ladder
+- extreme hills
+- eye of ender
+- family
+- feather falling boots
+- femur bone
+- fence gate
+- fenced in paddock
+- fermented spider eye
+- field of red tulips
+- filet mignon
+- fine grained glowstone dust
+- fire resistance
+- firewood
+- five gallon lava bucket
+- five kilogram iron pickaxe
+- flaming torch
+- flint and steel
+- floating lily pads
+- flying bat
+- flying vex mob
+- forsaken
+- fried cactus
+- friendly
+- frightening witch
+- frigid snow
+- frost walker
+- fully stocked armour stand
+- furnace minecart
+- furnace tender
+- gamemode
+- ghast tear
+- glittering dragon egg
+- glowing redstone ore
+- glowstone
+- god armour
+- gold horse armour
+- gold ingot
+- gold leggings
+- gold pickaxe
+- gold shovel
+- gold sword
+- golden apple
+- gourmet mushroom soup
+- grammy golden record
+- granny smith apple
+- granulated sugar
+- gravel
+- greasy fried chicken
+- green concrete
+- green melon block
+- green record
+- griefing is wrong
+- groaning zombie
+- guardian
+- guiding beacon
+- hardcore
+- hardened clay
+- hardy sapling
+- haste potion
+- hay block
+- heathvale
+- heavy gold block
+- heavy stone
+- herobrine
+- hissing creeper
+- home sweet home
+- honey glazed lamb chops
+- hopper
+- hopper minecart
+- ideas
+- illagers
+- illusioner
+- imperial iron helmet
+- informative sign
+- ink sack
+- iron block
+- iron boots
+- iron fence
+- iron horse armour
+- iron ingot
+- iron leggings
+- iron ore conveyor belt
+- iron sword
+- iron trapdoor
+- iron valley
+- jump boost
+- jungle fence gate
+- king sized bed
+- lapis block
+- lapis lazuli block
+- lapis ore
+- leather boots
+- leather chestplate
+- leather helmet
+- leather saddle
+- leather tunic
+- lemon
+- lever
+- levitation
+- light as a feather
+- light blue banner
+- light blue stained glass pane
+- light grey glazed terracotta
+- lightweight wood pickaxe
+- lilac bush
+- lingering potion of regeneration
+- llama caravan
+- locked chest
+- lush grassland
+- magenta terracotta
+- magma block
+- magma cube
+- majestic build
+- market
+- mega taiga
+- melon
+- melon stem
+- mending
+- minecart
+- mini pets
+- minigames
+- minimap waypoint
+- mining fatigue
+- moderator
+- modes of transportation
+- monster egg
+- monster eggs
+- mooshroom
+- mossy cobblestone
+- mossy cobblestone wall
+- move my world
+- multiplayer
+- multiplier
+- mundane potion
+- mushroom island
+- mycelium
+- name tag
+- nausea
+- nether brick fortress
+- nether brick stairs
+- nether fortress
+- nether quartz
+- nether stalk
+- nether wart block
+- nether warts
+- netherrack
+- no advertising
+- no spamming in chat
+- no yelling in chat
+- notch apple
+- note block
+- novelistic book
+- nutrient filled soil
+- observer
+- obsidian
+- ocelot
+- oinking pig
+- optifine
+- optimus prime
+- orange carrot
+- orange stained glass pane
+- orange tulip
+- ornate wood door
+- oxeye daisy
+- painting masterpiece
+- pan roasted fish
+- parrot
+- particles
+- penguin
+- picture perfect terrain
+- pillar quartz block
+- pineapple grilled pork chops
+- piston solenoid
+- planting seeds
+- pocketed leather leggings
+- poisonous potato
+- polished andesite
+- polished diorite
+- polished granite
+- porridge bowl
+- potion brewing
+- potion of weakness
+- powered minecart
+- prismarine crystals
+- prismarine shard
+- prison
+- projectile protection
+- protected claim
+- protective igloo
+- pruning shears
+- pufferfish
+- pumpkin seeds
+- pumpkin stem
+- purpur block
+- purpur slab
+- purpur stairs
+- putrid rotten flesh
+- quartz block quarry
+- quartz ore
+- rabbit hide
+- raging hot fire
+- raw beef tenderloin
+- raw chicken
+- raw fish fillet
+- raw mutton
+- raw rabbit
+- rawhide leather
+- rectangular portal
+- red concrete powder
+- red mushroom
+- red nether brick
+- red rose bouquet
+- red sandstone
+- red sandstone slab
+- red sandstone stairs
+- redstone
+- redstone block
+- redstone comparator
+- redstone lamp
+- redstone repeater
+- redstone torch wall bracket
+- redstone wire
+- refreshing water
+- refreshing water bucket
+- reliable diamond axe
+- replicator
+- resistance
+- resource pack
+- respect
+- respiration
+- rotting wood shovel
+- round stone button
+- rules
+- salmon loving polar bear
+- salted pork
+- sandstone
+- saturation
+- saved toolbars
+- secret trap door
+- seedless watermelon
+- shell lurking shulker
+- sherwood forest
+- shiny gold boots
+- shulker shell
+- silk touch
+- silverfish
+- skeleton horse
+- skeleton skull
+- skyblock
+- skyblock challenge
+- skygrid parkour
+- skyview
+- skywars
+- slime ball
+- slow cooked rabbit stew
+- smoked salmon
+- smoldering charcoal
+- smooth brick
+- smooth red sandstone
+- smooth stairs
+- snow ball
+- snow block
+- snowman
+- soft gold axe
+- solid core wooden door
+- solid granite
+- soul sand
+- sour cream covered baked potato
+- sourdough bread
+- spartan gold helmet
+- speckled melon
+- spectate
+- spider eye
+- spigot
+- spitting llama
+- splash potion of invisibility
+- splash potion of leaping
+- splash potion of night vision
+- splash potion of slowness
+- splash potion of strength
+- splash potion of weakness
+- spleef
+- split rail nether fence
+- spooky undead horse
+- spotted horse
+- spruce wood boat
+- stained clay
+- stainless steel iron chestplate
+- standard wood stairs
+- steve
+- sticks and stones
+- sticky piston
+- stone monster egg
+- stone pickaxe
+- storage minecart
+- straight rails
+- string
+- stronghold
+- stubborn donkey
+- stubborn server owners
+- stubborn mule
+- sturdy diamond boots
+- sugar cane
+- sulphur
+- sunflower
+- sunlight immune husk
+- super spleef
+- surviving the elements in survival
+- swampland
+- sweeping edge
+- tarnished iron hoe
+- ten liter bucket
+- terracotta
+- thick magma cream
+- thin glass
+- tickets
+- ticks per second
+- totem of undying
+- towering purpur pillar
+- trails
+- trapped chest
+- travelling by minecart
+- tropical jungle
+- turkish carpet
+- two story bookshelf
+- ultimate mining
+- ultimate weapons
+- uncut diamond
+- undercooked chicken
+- unexplored cave
+- unicorn
+- unmined gold ore
+- unpeeled banana
+- unsalted butter
+- unscramble
+- valuable diamond ore
+- verdant field
+- villager trading
+- vindicator
+- vintage jukebox
+- wagyu beef ribeye steak
+- war chicken
+- war fish
+- war mutton
+- war rabbit
+- water breathing potion
+- water lily
+- watermelon seeds
+- watery clay
+- well balanced diamond sword
+- well worn brick stairs
+- well worn iron shovel
+- wet sponge
+- wheat field
+- white paper
+- white tulip
+- wide open savanna
+- wild expanse
+- wither
+- wither skeleton
+- wither skeleton skull
+- wither skull
+- wood plate
+- wood sword
+- woodcutting lumberjack
+- wooden boat
+- woodland mansion
+- wool garment
+- workbench
+- wormhole
+- wrist watch
+- yellow flower
+- yellow stained glass pane
+- zombie head
+- zombie horse
+- zombie pigman
+- zombie villager

@@ -1,0 +1,35 @@
+interval: 13
+length: 30
+warning-period: 10
+hint-interval: 12
+min-players: 3
+words: []
+prizes:
+- '20': item GOLDEN_APPLE 1
+- '20': item GRILLED_PORK 1
+- '20': item COOKED_BEEF 1
+- '20': item COOKED_FISH 1
+- '20': item CARROT_ITEM 1
+- '20': item PUMPKIN_PIE 1
+- '10': item SPECKLED_MELON 1
+- '10': item EXP_BOTTLE 6
+- '10': item GOLDEN_CARROT 1
+- '10': item DIAMOND 1
+- '10': item BLAZE_ROD 2
+- '8': item QUARTZ_BLOCK 1
+- '8': item IRON_BLOCK 1
+- '8': item END_CRYSTAL 2
+- '5': item EMERALD 1
+- '5': item END_ROD 1
+- '5': item RABBIT_FOOT 1
+- '3': item DIAMOND_PICKAXE 1
+- '3': item DIAMOND_SWORD 1
+- '3': item DIAMOND_HELMET 1
+- '3': item DIAMOND_CHESTPLATE 1
+- '3': item DIAMOND_LEGGINGS 1
+- '3': item DIAMOND_BOOTS 1
+- '1': item ELYTRA 1
+- '1': item PURPLE_SHULKER_BOX 1
+- '1': item DRAGONS_BREATH 1
+- '1': item NETHER_STAR 1
+mTotal: 0

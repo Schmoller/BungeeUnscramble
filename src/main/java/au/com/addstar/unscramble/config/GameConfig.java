@@ -21,7 +21,7 @@ import net.cubespace.Yamler.Config.YamlConfig;
 
 public class  GameConfig extends YamlConfig
 {
-	private static final WeightedPrizeSaver mSaver = new WeightedPrizeSaver(null);
+    private static final WeightedPrizeSaver mSaver = new WeightedPrizeSaver();
 	
 	public GameConfig()
 	{
@@ -41,25 +41,25 @@ public class  GameConfig extends YamlConfig
 	}
 	
 	@Comment("The time between games in minutes. This time includes the length of the game, so it is the real interval.")
-	public final int interval = 15;
+    public int interval = 15;
 
 	@Comment("The warning period (in seconds) given so people have time to get ready")
 	@Path("warning-period")
-	public final int warningPeriod = 3;
+    public int warningPeriod = 3;
 
 	@Path("min-players")
 	@Comment("The minimum number of players online needed to run this game")
-	public final int minPlayers = 3;
+    public int minPlayers = 3;
 	
 	@Path("words")
 	@Comment("The words the game can draw from. You can have as many words as you want and they may include spaces. Leave empty to use the normal random word list")
-	private final List<String> wordList;
+    public List<String> wordList;
 	
 	@Comment("The prizes that will be given out.")
-	private final List<WeightedPrize> prizes;
-	
-	private ArrayList<Entry<Integer, Prize>> mWeightedPrizes;
-	private int mTotal;
+    public List<WeightedPrize> prizes;
+
+    public ArrayList<Entry<Integer, Prize>> mWeightedPrizes;
+    public int mTotal;
 	
 	public Session newSession()
 	{
@@ -113,8 +113,8 @@ public class  GameConfig extends YamlConfig
 			}
 		}
 	}
-	
-	private Prize getPrize()
+
+    public Prize getPrize()
 	{
 		if(mWeightedPrizes.isEmpty())
 			return null;

@@ -5,11 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.cubespace.Yamler.Config.InternalConverter;
 import net.cubespace.Yamler.Config.Converter.Converter;
+import net.cubespace.Yamler.Config.InternalConverter;
 
-class WeightedPrizeSaver implements Converter
-{
+public class WeightedPrizeSaver implements Converter {
+	public WeightedPrizeSaver() {
+	}
+
 	public WeightedPrizeSaver(InternalConverter converter)
 	{
 	}
