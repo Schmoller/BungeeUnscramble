@@ -53,7 +53,7 @@ public class Unscramble extends Plugin implements Listener
 	public void onEnable()
 	{
 		instance = this;
-		if(!getDataFolder().exists()||!getDataFolder().mkdirs())getLogger().warning("Could not " +
+        if (!getDataFolder().exists() && !getDataFolder().mkdirs()) getLogger().warning("Could not " +
 				"create Data Dir!!!");
 
 		getProxy().getPluginManager().registerCommand(this, new UnscrambleCommand());
