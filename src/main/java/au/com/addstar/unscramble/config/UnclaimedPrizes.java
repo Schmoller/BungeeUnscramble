@@ -27,8 +27,8 @@ public class UnclaimedPrizes extends YamlConfig
 		
 		prizes = new ArrayList<>();
 	}
-	
-	public final List<SavedPrize> prizes;
+
+    public List<SavedPrize> prizes;
 	
 	public List<SavedPrize> getPrizes(String player, boolean remove, int maxPrizesToRemove)
 	{
