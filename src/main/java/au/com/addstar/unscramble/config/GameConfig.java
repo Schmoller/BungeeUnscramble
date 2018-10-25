@@ -43,9 +43,16 @@ public class  GameConfig extends YamlConfig
 	@Comment("The time between games in minutes. This time includes the length of the game, so it is the real interval.")
     public int interval = 15;
 
+    @Comment("The length of the game in seconds")
+    public int length = 30;
+
 	@Comment("The warning period (in seconds) given so people have time to get ready")
 	@Path("warning-period")
     public int warningPeriod = 3;
+
+    @Path("hint-interval")
+    @Comment("The time between each hint given in seconds. 0 will disable hints")
+    public int hintInterval = 12;
 
 	@Path("min-players")
 	@Comment("The minimum number of players online needed to run this game")
@@ -63,8 +70,6 @@ public class  GameConfig extends YamlConfig
 	
 	public Session newSession()
 	{
-		int hintInterval = 12;
-		int length = 30;
 		if(wordList.isEmpty())
 			return new Session("", length * 1000, hintInterval * 1000, getPrize());
 		

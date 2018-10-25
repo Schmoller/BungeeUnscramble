@@ -14,7 +14,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
-class UnscrambleCommand extends Command
+public class UnscrambleCommand extends Command
 {
 	public UnscrambleCommand()
 	{
