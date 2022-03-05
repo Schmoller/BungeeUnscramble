@@ -22,6 +22,7 @@ import au.com.addstar.unscramble.prizes.SavedPrize;
 
 import net.cubespace.Yamler.Config.InvalidConfigurationException;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
@@ -151,8 +152,12 @@ public class Unscramble extends Plugin implements Listener
 			throw new IllegalStateException("Session in progress");
 
 		Session session = new Session(word, length, hintInterval, prize);
-		session.start();
-		mCurrentSession = session;
+		if (session.isValid()) {
+			session.start();
+			mCurrentSession = session;
+		} else {
+			ProxyServer.getInstance().getLogger().warning("BungeeUnscramble: Invalid game, aborted!");
+		}
 	}
 
 	public void startAutoGame()

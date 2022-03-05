@@ -3,6 +3,7 @@ package au.com.addstar.unscramble;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import au.com.addstar.unscramble.prizes.Prize;
@@ -17,6 +18,8 @@ public class Session implements Runnable
 {
 	private final String mWord;
 	private String mWordScramble;
+
+	private boolean isValid = false;
 	
 	private final long mEndTime;
 	private long mLastAnnounce;
@@ -49,7 +52,15 @@ public class Session implements Runnable
 		mPrize = prize;
 		scramble();
 	}
-	
+
+	public boolean isValid() {
+		return isValid;
+	}
+
+	public void setValid(boolean valid) {
+		isValid = valid;
+	}
+
 	public void start()
 	{
 		String unscrambleMessage = ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "New Game! Unscramble " + ChatColor.ITALIC + "this: ";
@@ -254,14 +265,25 @@ public class Session implements Runnable
 			ArrayList<Character> chars = new ArrayList<>(word.length());
 			for(int c = 0; c < word.length(); ++c)
 				chars.add(word.charAt(c));
-			
-			while(word.equals(words[i])) // Dont allow the correct word to appear
+
+			int maxtimes = 1000;
+			int times = 0;
+			while(word.equals(words[i]) && times < maxtimes) // Dont allow the correct word to appear
 			{
+				times++;
 				Collections.shuffle(chars, Unscramble.rand);
 				
 				StringBuilder builder = new StringBuilder(word.length());
 				for (Character aChar : chars) builder.append(aChar);
 				word = builder.toString();
+			}
+			if (times >= maxtimes) {
+				Logger l = ProxyServer.getInstance().getLogger();
+				l.warning("BungeeUnscramble: Unable to find valid word shuffle after 1000 times!");
+				l.warning("Phrase: \"" + mWord + "\"");
+				l.warning("Word: \"" + words[i] + "\"");
+				l.warning("Last attempt: \"" + word + "\"");
+				setValid(false);
 			}
 			
 			words[i] = word;
@@ -276,6 +298,6 @@ public class Session implements Runnable
 		}
 		
 		mWordScramble = builder.toString();
-		
+		setValid(true);
 	}
 }
