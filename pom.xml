@@ -107,6 +107,41 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.4</version>
+        <configuration>
+          <artifactSet>
+            <includes>
+              <include>net.cubespace:Yamler-Core</include>
+            </includes>
+          </artifactSet>
+          <filters>
+            <filter>
+              <artifact>net.cubespace:Yamler-Core:*</artifact>
+              <excludes>
+                <exclude>META-INF/MANIFEST.MF</exclude>
+              </excludes>
+            </filter>
+          </filters>
+          <createDependencyReducedPom>false</createDependencyReducedPom>
+          <relocations>
+            <relocation>
+              <pattern>net.cubespace.Yamler</pattern>
+              <shadedPattern>au.com.addstar.unscramble.Yamler</shadedPattern>
+            </relocation>
+          </relocations>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.3.2</version>
         <configuration>
