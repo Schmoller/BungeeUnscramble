@@ -4,5 +4,3 @@ version: ${plugin.version}
 main: au.com.addstar.unscramble.Unscramble
 
 author: Schmoller
-
-depends: [Yamler]
