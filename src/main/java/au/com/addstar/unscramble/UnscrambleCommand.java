@@ -2,6 +2,7 @@ package au.com.addstar.unscramble;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import au.com.addstar.unscramble.prizes.Prize;
@@ -51,6 +52,10 @@ public class UnscrambleCommand extends Command
 			else if(args[0].equalsIgnoreCase("claim"))
 			{
 				commandClaim(sender);
+			}
+			else if(args[0].equalsIgnoreCase("stats"))
+			{
+				commandStats(sender);
 			}
 			else if(args[0].equalsIgnoreCase("reload"))
 			{
@@ -104,7 +109,7 @@ public class UnscrambleCommand extends Command
 			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "cancel " + ChatColor.YELLOW + "- Cancels any currently running game"));
 		
 		if(sender.hasPermission("unscramble.newgame")) {
-			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "newgame w:[word] t:[time] h:[hint-interval] [prize] " + ChatColor.YELLOW + "- Starts a new game with the given details"));
+			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "newgame w:[word] t:[time] h:[hint-interval] c:[hint-chars] [prize] " + ChatColor.YELLOW + "- Starts a new game with the given details"));
 			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + " [prize] examples: " + ChatColor.GOLD  + "item diamond 1" + ChatColor.GREEN + " or " + ChatColor.GOLD  + "$150"));
 			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + " Note: Underscores (_) in [word] will be changed into spaces"));
 		}
@@ -181,7 +186,25 @@ public class UnscrambleCommand extends Command
 		else
 			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + "No prizes found under your name."));
 	}
-	
+
+	private void commandStats(CommandSender sender) {
+		UUID uuid;
+		ProxiedPlayer player;
+		if (sender instanceof ProxiedPlayer) {
+			player = (ProxiedPlayer) sender;
+			uuid = player.getUniqueId();
+		} else {
+			sender.sendMessage(ChatColor.RED + "This command must be run by a player");
+			return;
+		}
+		DatabaseManager dbm = Unscramble.instance.getDatabaseManager();
+		DatabaseManager.PlayerRecord rec = dbm.getRecord(uuid);
+		sender.sendMessage(ChatColor.YELLOW + "Unscramble stats for " + player.getDisplayName() + ":");
+		sender.sendMessage(ChatColor.GREEN + "> Point Balance: " + ChatColor.AQUA + rec.getPoints());
+		sender.sendMessage(ChatColor.GREEN + "> Total Wins: " + ChatColor.AQUA + rec.getWins());
+		sender.sendMessage(ChatColor.GREEN + "> Total Points: " + ChatColor.AQUA + rec.getTotalPoints());
+	}
+
 	private void commandReload(CommandSender sender)
 	{
 		Unscramble.instance.reload();
@@ -221,6 +244,7 @@ public class UnscrambleCommand extends Command
 		
 		String word = "";
 		int hints = 0;
+		int hintChars = 2;
 		int time = 30000;
 		Prize prize = null;
 		
@@ -280,6 +304,25 @@ public class UnscrambleCommand extends Command
 					return;
 				}
 			}
+			else if(arg.startsWith("c:"))
+			{
+				try
+				{
+					hintChars = Integer.parseInt(arg.substring(2));
+
+					if(hintChars <= 0)
+					{
+						sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Number of chars to reveal per hint"));
+						return;
+					}
+
+				}
+				catch(NumberFormatException e)
+				{
+					sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Hint-chars interval must be 1 or greater"));
+					return;
+				}
+			}
 			else
 			{
 				StringBuilder prizeString = new StringBuilder();
@@ -309,7 +352,7 @@ public class UnscrambleCommand extends Command
 			}
 		}
 		
-		Unscramble.instance.newSession(word, time, hints, prize);
+		Unscramble.instance.newSession(word, time, hints, hintChars, prize);
 	}
 
 }

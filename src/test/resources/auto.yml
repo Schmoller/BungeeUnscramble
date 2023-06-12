@@ -3,6 +3,7 @@ length: 30
 warning-period: 10
 hint-interval: 12
 min-players: 3
+hint-chars: 2
 words: []
 prizes:
 - '20': item GOLDEN_APPLE 1
@@ -32,4 +33,3 @@ prizes:
 - '1': item PURPLE_SHULKER_BOX 1
 - '1': item DRAGONS_BREATH 1
 - '1': item NETHER_STAR 1
-mTotal: 0

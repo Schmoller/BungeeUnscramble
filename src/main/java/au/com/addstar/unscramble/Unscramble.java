@@ -42,6 +42,7 @@ public class Unscramble extends Plugin implements Listener
 	private GameConfig mAutoGame;
 	private ScheduledTask mAutoGameTask;
 	private MainConfig mConfig;
+	private DatabaseManager mDBManager;
 	public static final String channelName = "bungee:unscramble";
 
 	private UnclaimedPrizes mUnclaimed;
@@ -104,6 +105,11 @@ public class Unscramble extends Plugin implements Listener
 		{
 			mConfig.init();
 			mUnclaimed.init();
+
+			// Close any existing connections before re-establishing new database connections
+			if (mDBManager != null)
+				mDBManager.close();
+			mDBManager = new DatabaseManager(mConfig.dbURL, mConfig.dbUsername, mConfig.dbPassword);
 		}
 		catch(InvalidConfigurationException e)
 		{
@@ -146,12 +152,12 @@ public class Unscramble extends Plugin implements Listener
 		mCurrentSession = null;
 	}
 
-	public void newSession(String word, long length, long hintInterval, Prize prize)
+	public void newSession(String word, long length, long hintInterval, int hintChars, Prize prize)
 	{
 		if(mCurrentSession != null)
 			throw new IllegalStateException("Session in progress");
 
-		Session session = new Session(word, length, hintInterval, prize);
+		Session session = new Session(word, length, hintInterval, hintChars, prize);
 		if (session.isValid()) {
 			session.start();
 			mCurrentSession = session;
@@ -235,6 +241,10 @@ public class Unscramble extends Plugin implements Listener
 	public MainConfig getConfig()
 	{
 		return mConfig;
+	}
+	public DatabaseManager getDatabaseManager()
+	{
+		return mDBManager;
 	}
 
 	@EventHandler
@@ -398,7 +408,7 @@ public class Unscramble extends Plugin implements Listener
 
 			long expirationTimeMillis = System.currentTimeMillis() - prizeExpirationDays * 86400 * 1000;
 
-			getLogger().info("Looking for expired unclaimed prizes; count = " + mUnclaimed.prizes.size());
+			//getLogger().info("Looking for expired unclaimed prizes; count = " + mUnclaimed.prizes.size());
 
 			Iterator<SavedPrize> it = mUnclaimed.prizes.iterator();
 

@@ -1,13 +1,13 @@
 package au.com.addstar.unscramble;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import au.com.addstar.unscramble.prizes.Prize;
 
+import com.google.common.base.Joiner;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -26,9 +26,12 @@ public class Session implements Runnable
 	
 	private String mHint;
 	private final long mHintInterval;
+	private final int mHintChars;
 	private long mLastHint;
 	
 	private final Prize mPrize;
+	private int mPoints;
+	private int mDifficulty;
 	
 	private ScheduledTask mTask;
 	
@@ -36,7 +39,7 @@ public class Session implements Runnable
 
 	private final Pattern STRIP_COLOR_PATTERN;
 
-	public Session(String word, long duration, long hintInterval, Prize prize)
+	public Session(String word, long duration, long hintInterval, int hintChars, Prize prize)
 	{
 		if(word.isEmpty())
 			word = Unscramble.instance.getRandomWord();
@@ -46,6 +49,7 @@ public class Session implements Runnable
 		
 		mHint = word.replaceAll("[^ ]", "*");
 		mHintInterval = hintInterval;
+		mHintChars = hintChars;
 
 		STRIP_COLOR_PATTERN = Pattern.compile("(?i)[&\u00A7][0-9A-FK-OR]");
 
@@ -63,6 +67,8 @@ public class Session implements Runnable
 
 	public void start()
 	{
+		mDifficulty = getWordDifficulty(mWord);
+		mPoints = getPointsForDifficulty(mDifficulty);
 		String unscrambleMessage = ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "New Game! Unscramble " + ChatColor.ITALIC + "this: ";
 
 		if(mWordScramble.length() >= 15) {
@@ -92,9 +98,12 @@ public class Session implements Runnable
 	
 	public void doHint()
 	{
-		if(!mHint.contains("*"))
+		// Do nothing if we've already revealed too much
+		if (countChar(mHint, '*') <= mHintChars)
 			return;
-		
+
+		// Reveal the necessary number of chars
+		int charsRevealed = 0;
 		while(true)
 		{
 			int index = Unscramble.rand.nextInt(mWord.length());
@@ -107,7 +116,9 @@ public class Session implements Runnable
 				char[] chars = mHint.toCharArray();
 				chars[index] = c;
 				mHint = new String(chars);
-				break;
+				charsRevealed++;
+				if (charsRevealed >= mHintChars)
+					break;
 			}
 		}
 		
@@ -138,15 +149,15 @@ public class Session implements Runnable
 			mTask.cancel();
 			mTask = null;
 			
-			if(mPrize != null)
-				Unscramble.instance.givePrize(player, mPrize);
-			
 			Unscramble.instance.onSessionFinish();
 			
 			ProxyServer.getInstance().getScheduler().schedule(Unscramble.instance, () -> {
                 ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Congratulations " + ChatColor.stripColor(player.getDisplayName()) + "!"));
                 if(mPrize != null)
-                    player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Use " + ChatColor.RED + "/us claim" + ChatColor.DARK_AQUA + " to claim your prize!"));
+					Unscramble.instance.givePrize(player, mPrize);
+					DatabaseManager.PlayerRecord rec = Unscramble.instance.getDatabaseManager().getRecord(player.getUniqueId());
+					Unscramble.instance.getDatabaseManager().saveRecord(rec.playerWin(mPoints));
+					player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Use " + ChatColor.RED + "/us claim" + ChatColor.DARK_AQUA + " to claim your prize!"));
             }, 200, TimeUnit.MILLISECONDS);
 		}
 		else
@@ -182,10 +193,10 @@ public class Session implements Runnable
 		long sinceLastAnnounce = System.currentTimeMillis() - mLastAnnounce;
 		
 		boolean announce = false;
-		if(sinceLastAnnounce >= 1000 && left <= 5000)
+		if(sinceLastAnnounce >= 1000 && left <= 3000)
 			announce = true;
-		else if(sinceLastAnnounce >= 5000 && left <= 20000)
-			announce = true;
+		//else if(sinceLastAnnounce >= 5000 && left <= 20000)
+		//	announce = true;
 		else if(sinceLastAnnounce >= 10000 && left <= 30000)
 			announce = true;
 		else if(sinceLastAnnounce >= 15000 && left <= 60000)
@@ -268,7 +279,12 @@ public class Session implements Runnable
 
 			int maxtimes = 1000;
 			int times = 0;
-			while(word.equals(words[i]) && times < maxtimes) // Dont allow the correct word to appear
+			while((word.equals(words[i])
+					|| word.equals("shit")
+					|| word.equals("craps")
+					|| word.equals("parts")
+					|| word.equals("piss"))
+						&& times < maxtimes) // Avoid same word or offensive words
 			{
 				times++;
 				Collections.shuffle(chars, Unscramble.rand);
@@ -299,5 +315,98 @@ public class Session implements Runnable
 		
 		mWordScramble = builder.toString();
 		setValid(true);
+	}
+
+	public static int getWordDifficulty(String phrase) {
+		// Split the phrase into individual words
+		String[] words = phrase.split(" ");
+
+		// Calculate the number of words
+		int wordCount = words.length;
+
+		// Calculate the average word length
+		int totalLength = 0;
+		for (String word : words) {
+			totalLength += word.length();
+		}
+		int averageLength = (int) Math.round((double) totalLength / wordCount);
+
+		// Calculate the complexity for each word
+		int totalComplexity = 0;
+		List<Integer> wordScores = new ArrayList<>();
+		for (String word : words) {
+			int wordComplexity = calculateWordComplexity(word);
+			totalComplexity += wordComplexity;
+			wordScores.add(wordComplexity);
+		}
+
+		ProxyServer.getInstance().getLogger().info("[Unscramble] Difficulty: " + phrase
+				+ " = " + totalComplexity
+				+ " (" + Joiner.on("+").join(wordScores) + ")");
+		return totalComplexity;
+	}
+
+	private static int calculateWordComplexity(String word) {
+		// Create a set of common English words
+		Set<String> commonWords = new HashSet<>(Arrays.asList(
+				// Add more common words as needed
+				"a", "an", "the", "is", "are", "was", "were", "and", "or", "but",
+				"if", "then", "that", "this", "it", "of", "on", "in", "at", "to",
+				"with", "for", "from", "by", "about", "as", "into", "like", "through",
+				"after", "over", "between", "out", "up", "down", "all", "no", "not",
+				"some", "more", "most", "few", "fewer", "many", "much", "any", "every",
+				"other", "such", "only", "just", "also", "very", "really", "even", "well",
+				"now", "then", "there", "here", "how", "where", "when", "why", "what", "which"
+		));
+
+		// Count the number of unique characters in the word
+		Set<Character> uniqueCharacters = new HashSet<>();
+		for (int i = 0; i < word.length(); i++) {
+			uniqueCharacters.add(word.charAt(i));
+		}
+
+		// Calculate the complexity based on the number of unique characters
+		int complexity = uniqueCharacters.size();
+
+		// Reduce complexity for common English words
+		if (commonWords.contains(word.toLowerCase())) {
+			complexity = (int) Math.max(1, complexity - 1);
+		}
+
+		return complexity;
+	}
+
+	public int getPointsForDifficulty(int difficulty) {
+		int points = 1;
+		String selected = "default";
+		List<String> table = Unscramble.instance.getConfig().pointsTable;
+
+		// Walk the difficulty table to find the point range for this score
+		for (String entry : table) {
+			String[] parts = entry.replace(" ", ""). split(":");
+			int key = Integer.parseInt(parts[0]);
+			int val = Integer.parseInt(parts[1]);
+			//ProxyServer.getInstance().getLogger().info("[Unscramble] Points entry: " + entry);
+			// Stop looking when we find an entry greater than the difficulty
+			if (key > difficulty) {
+				break;
+			}
+			points = val;
+			selected = entry;
+		}
+		ProxyServer.getInstance().getLogger().info("[Unscramble] Points: " + points + " (" + selected + ")");
+		return points;
+	}
+
+	public int countChar(String str, char c)
+	{
+		int count = 0;
+
+		for(int i=0; i < str.length(); i++)
+		{    if(str.charAt(i) == c)
+			count++;
+		}
+
+		return count;
 	}
 }

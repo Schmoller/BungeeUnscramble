@@ -54,6 +54,10 @@ public class  GameConfig extends YamlConfig
     @Comment("The time between each hint given in seconds. 0 will disable hints")
     public int hintInterval = 12;
 
+	@Path("hint-chars")
+	@Comment("The number of characters to reveal in each hint")
+	public int hintChars = 2;
+
 	@Path("min-players")
 	@Comment("The minimum number of players online needed to run this game")
     public int minPlayers = 3;
@@ -66,14 +70,14 @@ public class  GameConfig extends YamlConfig
     public List<WeightedPrize> prizes;
 
     public ArrayList<Entry<Integer, Prize>> mWeightedPrizes;
-    public int mTotal;
+    private int mTotal;
 	
 	public Session newSession()
 	{
 		if(wordList.isEmpty())
-			return new Session("", length * 1000, hintInterval * 1000, getPrize());
+			return new Session("", length * 1000, hintInterval * 1000, hintChars, getPrize());
 		
-		return new Session(wordList.get(Unscramble.rand.nextInt(wordList.size())), length * 1000, hintInterval * 1000, getPrize());
+		return new Session(wordList.get(Unscramble.rand.nextInt(wordList.size())), length * 1000, hintInterval * 1000, hintChars, getPrize());
 	}
 	
 	@Override

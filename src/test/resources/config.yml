@@ -1,17 +1,21 @@
 display-answer-on-failed-games: true
 auto-game-enabled: true
-# Unclaimed prizes more than this number of days old are deleted
 prize-expiration-days: 21
-# The time threshold for warning players of expiring prizes
 expiring-prize-warning-days: 5
-# The names of servers players may claim their rewards on
+points-table:
+  - "0:1"
+  - "12:2"
+  - "19:2"
+  - "23:3"
+  - "28:4"
+  - "33:5"
+db-url: "jdbc:mysql://localhost:3306/db_name"
+db-username: user
+db-password: pass
 claim-servers:
 - survival
 - hub
 random-words:
-########################################
-######         Staff Names        ######
-########################################
 - absorption health boost
 - acacia door
 - acacia sapling
