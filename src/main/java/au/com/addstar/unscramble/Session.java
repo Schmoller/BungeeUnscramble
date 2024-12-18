@@ -231,6 +231,7 @@ public class Session implements Runnable
                 if(mPrize != null) {
 					Unscramble.instance.givePrize(player, mPrize);
 					DatabaseManager.PlayerRecord rec = Unscramble.instance.getDatabaseManager().getRecord(player.getUniqueId());
+					Unscramble.instance.getDatabaseManager().saveRecord(rec.playerWin(mPoints));
 					if (mPrize instanceof PointsPrize) {
 						player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "You now have " + ChatColor.GOLD + rec.getPoints() + ChatColor.DARK_AQUA + " unscramble points."));
 						// If points are less than 5 (or multiple of 25), tell the player to check their stats
@@ -242,7 +243,6 @@ public class Session implements Runnable
 					} else {
 						player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Use " + ChatColor.RED + "/us claim" + ChatColor.DARK_AQUA + " to claim your prize!"));
 					}
-					Unscramble.instance.getDatabaseManager().saveRecord(rec.playerWin(mPoints));
 					Unscramble.instance.getDatabaseManager().saveWin(player.getUniqueId(), mWord, mDifficulty, mPoints, duration);
 				}
             }, 200, TimeUnit.MILLISECONDS);
