@@ -12,7 +12,7 @@ public class Prizes
 			return MoneyPrize.load(map);
 		else if(type.equals("item"))
 			return ItemPrize.load(map);
-		
+
 		return null;
 	}
 	
@@ -70,7 +70,11 @@ public class Prizes
 			
 			return new ItemPrize(material, data, count);
 		}
-		
+		else if(prize.startsWith("points"))
+		{
+			return new PointsPrize();
+		}
+
 		return null;
 	}
 }

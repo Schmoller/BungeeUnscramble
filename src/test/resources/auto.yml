@@ -33,3 +33,4 @@ prizes:
 - '1': item PURPLE_SHULKER_BOX 1
 - '1': item DRAGONS_BREATH 1
 - '1': item NETHER_STAR 1
+randomOffset: 5

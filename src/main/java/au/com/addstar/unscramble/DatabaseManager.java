@@ -50,6 +50,23 @@ public class DatabaseManager {
         }
     }
 
+    public void saveWin(UUID playerid, String word, int diff, int points, double duration) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(
+                     "INSERT INTO wins (playerid, phrase, duration, difficulty, points) VALUES (?, ?, ?, ?, ?)")) {
+
+            statement.setString(1, playerid.toString());
+            statement.setString(2, word);
+            statement.setDouble(3, duration);
+            statement.setInt(4, diff);
+            statement.setInt(5, points);
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public PlayerRecord getRecord(UUID id) {
         try (Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM players WHERE playerid = ?")) {

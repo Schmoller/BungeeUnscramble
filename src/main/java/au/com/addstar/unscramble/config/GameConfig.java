@@ -43,6 +43,9 @@ public class  GameConfig extends YamlConfig
 	@Comment("The time between games in minutes. This time includes the length of the game, so it is the real interval.")
     public int interval = 15;
 
+	@Comment("The time between games in minutes. This time includes the length of the game, so it is the real interval.")
+	public int randomOffset = 5;
+
     @Comment("The length of the game in seconds")
     public int length = 30;
 

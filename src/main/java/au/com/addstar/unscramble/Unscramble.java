@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import au.com.addstar.unscramble.config.GameConfig;
 import au.com.addstar.unscramble.config.MainConfig;
 import au.com.addstar.unscramble.config.UnclaimedPrizes;
+import au.com.addstar.unscramble.prizes.PointsPrize;
 import au.com.addstar.unscramble.prizes.Prize;
 import au.com.addstar.unscramble.prizes.SavedPrize;
 
@@ -32,11 +33,15 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
 import net.md_5.bungee.event.EventHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Unscramble extends Plugin implements Listener
 {
 	public static final Random rand = new Random();
+	private static final Logger log = LoggerFactory.getLogger(Unscramble.class);
 	public static Unscramble instance;
+	private boolean mDebug = false;
 
 	private Session mCurrentSession = null;
 	private GameConfig mAutoGame;
@@ -87,16 +92,40 @@ public class Unscramble extends Plugin implements Listener
 
 			if(mConfig.autoGameEnabled)
 			{
-				getLogger().info("Starting AutoGame timer. Will only run with at least " + mAutoGame.minPlayers + " players online.");
-				mAutoGameTask = getProxy().getScheduler().schedule(this, new AutoGameStarter(mAutoGame.warningPeriod, mAutoGame.minPlayers), mAutoGame.interval, mAutoGame.interval, TimeUnit.MINUTES);
+				debugMsg("Starting AutoGame timer. Will only run with at least " + mAutoGame.minPlayers + " players online.");
+				scheduleNextGame();
 			}
 		}
 		catch(InvalidConfigurationException e)
 		{
 			mAutoGame = null;
-			System.err.println("Could not load auto game: " + e.getMessage());
+			getLogger().severe("Could not load auto game: " + e.getMessage());
 			e.printStackTrace();
 		}
+	}
+
+	public ScheduledTask scheduleNextGame()
+	{
+		// Cancel any existing scheduled game
+		if(mAutoGameTask != null)
+			mAutoGameTask.cancel();
+		mAutoGameTask = null;
+
+		if(mAutoGame == null)
+			return null;
+
+		// Skew the interval time (plus or minus) by randomOffset minutes
+		int offsetSecs = rand.nextInt((mAutoGame.randomOffset*60) * 2) - mAutoGame.randomOffset*60;
+		debugMsg("Random offset: " + offsetSecs + " seconds (range: " + mAutoGame.randomOffset + "mins)");
+		debugMsg("Next AutoGame will start in " + ((mAutoGame.interval*60) + offsetSecs) + " seconds.");
+
+		// Schedule the task once (with random offset), then it will reschedule itself
+		mAutoGameTask = getProxy().getScheduler().schedule(
+				this,
+				new AutoGameStarter(mAutoGame.warningPeriod, mAutoGame.minPlayers),
+				(mAutoGame.interval*60) + offsetSecs,
+				TimeUnit.SECONDS);
+		return mAutoGameTask;
 	}
 
 	public void reload()
@@ -105,6 +134,7 @@ public class Unscramble extends Plugin implements Listener
 		{
 			mConfig.init();
 			mUnclaimed.init();
+			mDebug = mConfig.debugEnabled;
 
 			// Close any existing connections before re-establishing new database connections
 			if (mDBManager != null)
@@ -191,7 +221,9 @@ public class Unscramble extends Plugin implements Listener
 
 	public void givePrize(ProxiedPlayer player, Prize prize)
 	{
-		mUnclaimed.prizes.add(new SavedPrize(player.getName(), prize));
+		// Points prizes are saved in the databsae so dont try to track them in "unclaimed"
+		if (!(prize instanceof PointsPrize))
+			mUnclaimed.prizes.add(new SavedPrize(player.getName(), prize));
 
 		// Check for and remove expired prizes
 		removeExpiredPrizes();
@@ -297,7 +329,7 @@ public class Unscramble extends Plugin implements Listener
 			else if(subChannel.equals("AwardOk"))
 			{
 				getProxy().getPlayer(prize.player).sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "You have been awarded " + ChatColor.YELLOW + prize.prize.getDescription()));
-				getLogger().info("Awarded prize to " + prize.player + ": " + prize.prize.getDescription());
+				logMsg("Awarded prize to " + prize.player + ": " + prize.prize.getDescription());
 			}
 		}
 		catch(IOException ignored)
@@ -407,11 +439,7 @@ public class Unscramble extends Plugin implements Listener
 				prizeExpirationDays = 7;
 
 			long expirationTimeMillis = System.currentTimeMillis() - prizeExpirationDays * 86400 * 1000;
-
-			//getLogger().info("Looking for expired unclaimed prizes; count = " + mUnclaimed.prizes.size());
-
 			Iterator<SavedPrize> it = mUnclaimed.prizes.iterator();
-
 			while(it.hasNext())
 			{
 				SavedPrize prize = it.next();
@@ -423,7 +451,7 @@ public class Unscramble extends Plugin implements Listener
 				Date prizeDate = ParseDate(prize.entered);
 
 				if(prizeDate != null && prizeDate.getTime() < expirationTimeMillis) {
-					getLogger().info("Removing expired prize for " + prize.player + ", awarded " + prize.entered + "; " + prize.prize.getDescription());
+					logMsg("Removing expired prize for " + prize.player + ", awarded " + prize.entered + "; " + prize.prize.getDescription());
 					it.remove();
 				}
 			}
@@ -435,4 +463,39 @@ public class Unscramble extends Plugin implements Listener
 		}
 	}
 
+	public static boolean getDebug() {
+		return instance.mDebug;
+	}
+
+	public static void setDebug(boolean debug) {
+		instance.mDebug = debug;
+	}
+
+	public static void logMsg(String msg) {
+		instance.getLogger().info(msg);
+	}
+
+	public static void debugMsg(String msg) {
+		if (instance.mDebug) {
+			instance.getLogger().info(msg);
+		}
+	}
+
+	public static void broadcast(String message) {
+		broadcast(message, true);
+	}
+
+	public static void broadcast(String message, boolean usePrefix) {
+		broadcast(message, usePrefix, true);
+	}
+
+	public static void broadcast(String message, boolean usePrefix, boolean log) {
+		if (log)
+			logMsg(ChatColor.stripColor(message));
+
+		if (usePrefix)
+			message = ChatColor.GREEN + "[Unscramble] " + ChatColor.YELLOW + message;
+
+		ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(message));
+	}
 }

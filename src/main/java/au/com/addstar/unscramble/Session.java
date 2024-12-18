@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import au.com.addstar.unscramble.prizes.PointsPrize;
 import au.com.addstar.unscramble.prizes.Prize;
 
 import com.google.common.base.Joiner;
@@ -20,7 +21,8 @@ public class Session implements Runnable
 	private String mWordScramble;
 
 	private boolean isValid = false;
-	
+
+	private final long mStartTime;
 	private final long mEndTime;
 	private long mLastAnnounce;
 	
@@ -39,13 +41,71 @@ public class Session implements Runnable
 
 	private final Pattern STRIP_COLOR_PATTERN;
 
+	// Define Scrabble letter values
+	private static final Map<Character, Integer> scrabbleValues = new HashMap<>();
+
+	static {
+		scrabbleValues.put('a', 1);
+		scrabbleValues.put('e', 1);
+		scrabbleValues.put('i', 1);
+		scrabbleValues.put('l', 1);
+		scrabbleValues.put('n', 1);
+		scrabbleValues.put('o', 1);
+		scrabbleValues.put('r', 1);
+		scrabbleValues.put('s', 1);
+		scrabbleValues.put('t', 1);
+		scrabbleValues.put('u', 1);
+		scrabbleValues.put('d', 2);
+		scrabbleValues.put('g', 2);
+		scrabbleValues.put('b', 3);
+		scrabbleValues.put('c', 3);
+		scrabbleValues.put('m', 3);
+		scrabbleValues.put('p', 3);
+		scrabbleValues.put('f', 4);
+		scrabbleValues.put('h', 4);
+		scrabbleValues.put('v', 4);
+		scrabbleValues.put('w', 4);
+		scrabbleValues.put('y', 4);
+		scrabbleValues.put('k', 5);
+		scrabbleValues.put('j', 8);
+		scrabbleValues.put('x', 8);
+		scrabbleValues.put('q', 10);
+		scrabbleValues.put('z', 10);
+	}
+
+	// Words that have their score reduced by 70%
+	private static final Set<String> commonWords = new HashSet<>(Arrays.asList(
+			"a", "an", "the", "is", "are", "was", "were", "and", "or", "but",
+			"if", "then", "that", "this", "it", "of", "on", "in", "at", "to",
+			"with", "for", "from", "by", "about", "as", "into", "like", "through",
+			"after", "over", "between", "out", "up", "down", "all", "no", "not",
+			"some", "more", "most", "few", "fewer", "many", "much", "any", "every",
+			"other", "such", "only", "just", "also", "very", "really", "even", "well",
+			"now", "then", "there", "here", "how", "where", "when", "why", "what", "which"
+	));
+
+	// Words that have their score reduced by 30%
+	private static final Set<String> minecraftWords = new HashSet<>(Arrays.asList(
+			"block", "pickaxe", "sword", "wool", "axe", "shovel", "stone", "dirt", "grass", "diamond",
+			"gold", "iron", "coal", "wood", "plank", "log", "torch", "bed", "chest", "door", "craft",
+			"table", "armor", "helmet", "boots", "zombie", "creeper", "skeleton", "spider", "enderman",
+			"villager", "emerald", "fish", "bow", "arrow", "food", "water", "lava", "bucket", "boat",
+			"rail", "minecart", "redstone", "lever", "button", "piston", "portal", "nether", "end",
+			"bee", "sheep", "cow", "pig", "horse", "cat", "dog", "fox", "panda", "sugar", "cane",
+			"cake", "cookie", "apple", "carrot", "potato", "pumpkin", "melon", "seeds", "wheat",
+			"bread", "map", "compass", "clock", "shield", "banner", "sign", "book", "ink", "string",
+			"leather", "bone", "slime", "clay", "sand", "gravel", "glass", "ice", "snow", "brick",
+			"wool", "carpet", "bedrock", "sandstone", "torch", "eye", "ender"
+	));
+
 	public Session(String word, long duration, long hintInterval, int hintChars, Prize prize)
 	{
 		if(word.isEmpty())
 			word = Unscramble.instance.getRandomWord();
 		
 		mWord = word;
-		mEndTime = System.currentTimeMillis() + duration;
+		mStartTime = System.currentTimeMillis();
+		mEndTime = mStartTime + duration;
 		
 		mHint = word.replaceAll("[^ ]", "*");
 		mHintInterval = hintInterval;
@@ -69,17 +129,24 @@ public class Session implements Runnable
 	{
 		mDifficulty = getWordDifficulty(mWord);
 		mPoints = getPointsForDifficulty(mDifficulty);
-		String unscrambleMessage = ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "New Game! Unscramble " + ChatColor.ITALIC + "this: ";
+
+		// For Points prizes, make sure we set the points and difficulty
+		if (mPrize instanceof PointsPrize) {
+			((PointsPrize) mPrize).setDifficulty(mDifficulty);
+			((PointsPrize) mPrize).setPoints(mPoints);
+		}
+
+		String unscrambleMessage = ChatColor.DARK_AQUA + "New Game! Unscramble " + ChatColor.ITALIC + "this: ";
 
 		if(mWordScramble.length() >= 15) {
-			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(unscrambleMessage));
-			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.RED + mWordScramble));
+			Unscramble.broadcast(unscrambleMessage);
+			Unscramble.broadcast(ChatColor.RED + mWordScramble);
 		} else {
-			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(unscrambleMessage + ChatColor.RED + mWordScramble));
+			Unscramble.broadcast(ChatColor.RED + mWordScramble);
 		}
 
 		if(mPrize != null)
-			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "The prize for winning is " + ChatColor.YELLOW + mPrize.getDescription()));
+			Unscramble.broadcast(ChatColor.DARK_AQUA + "The prize for winning is " + ChatColor.YELLOW + mPrize.getDescription());
 		
 		mTask = ProxyServer.getInstance().getScheduler().schedule(Unscramble.instance, this, 0, 1, TimeUnit.SECONDS);
 		mLastHint = System.currentTimeMillis();
@@ -91,9 +158,9 @@ public class Session implements Runnable
 		mTask = null;
 		Unscramble.instance.onSessionFinish();
 		
-		ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Oh! Sorry, the game was cancelled."));
+		Unscramble.broadcast(ChatColor.DARK_AQUA + "Oh! Sorry, the game was cancelled.");
 		if(Unscramble.instance.getConfig().displayAnswer)
-			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "The answer was... " + ChatColor.RED + mWord));
+			Unscramble.broadcast(ChatColor.DARK_AQUA + "The answer was... " + ChatColor.RED + mWord);
 	}
 	
 	public void doHint()
@@ -122,7 +189,7 @@ public class Session implements Runnable
 			}
 		}
 		
-		ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Hint!... " + mHint));
+		Unscramble.broadcast(ChatColor.DARK_AQUA + "Hint!... " + mHint, true, false);
 	}
 	
 	private boolean isRunning()
@@ -135,7 +202,12 @@ public class Session implements Runnable
 		if(!isRunning())
 			return;
 
+		// Remove all colour codes from the guess
 		guess = STRIP_COLOR_PATTERN.matcher(guess).replaceAll("");
+
+		// Remove leading ! if message has one (for global chat)
+		if(guess.startsWith("!"))
+			guess = guess.substring(1);
 
 		if(mWord.equalsIgnoreCase(guess)) {
 
@@ -146,18 +218,33 @@ public class Session implements Runnable
 				return;
 			}
 
+			// Calculate the time taken to solve the word (rounded to 2 decimal places)
+			final double duration = Math.round((getTimeRunning() / 1000d) * 100.0) / 100.0;
+
 			mTask.cancel();
 			mTask = null;
 			
 			Unscramble.instance.onSessionFinish();
 			
 			ProxyServer.getInstance().getScheduler().schedule(Unscramble.instance, () -> {
-                ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Congratulations " + ChatColor.stripColor(player.getDisplayName()) + "!"));
-                if(mPrize != null)
+                Unscramble.broadcast(ChatColor.DARK_AQUA + "Congratulations " + ChatColor.stripColor(player.getDisplayName()) + "!");
+                if(mPrize != null) {
 					Unscramble.instance.givePrize(player, mPrize);
 					DatabaseManager.PlayerRecord rec = Unscramble.instance.getDatabaseManager().getRecord(player.getUniqueId());
+					if (mPrize instanceof PointsPrize) {
+						player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "You now have " + ChatColor.GOLD + rec.getPoints() + ChatColor.DARK_AQUA + " unscramble points."));
+						// If points are less than 5 (or multiple of 25), tell the player to check their stats
+						if ((rec.getWins() <= 5) || (rec.getPoints() % 25 == 0)) {
+							String claimmsg = ChatColor.translateAlternateColorCodes('&', Unscramble.instance.getConfig().claimMessage);
+							player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + claimmsg));
+							player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.LIGHT_PURPLE + "Type " + ChatColor.AQUA + "/us stats" + ChatColor.LIGHT_PURPLE + " to view your unscramble stats."));
+						}
+					} else {
+						player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Use " + ChatColor.RED + "/us claim" + ChatColor.DARK_AQUA + " to claim your prize!"));
+					}
 					Unscramble.instance.getDatabaseManager().saveRecord(rec.playerWin(mPoints));
-					player.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Use " + ChatColor.RED + "/us claim" + ChatColor.DARK_AQUA + " to claim your prize!"));
+					Unscramble.instance.getDatabaseManager().saveWin(player.getUniqueId(), mWord, mDifficulty, mPoints, duration);
+				}
             }, 200, TimeUnit.MILLISECONDS);
 		}
 		else
@@ -166,7 +253,7 @@ public class Session implements Runnable
 			if(mChatLines > 10)
 			{
 				mChatLines = 0;
-				ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Again, the word was... " + ChatColor.RED + mWordScramble));
+				Unscramble.broadcast(ChatColor.DARK_AQUA + "Again, the word was... " + ChatColor.RED + mWordScramble, true, false);
 			}
 		}
 		
@@ -179,9 +266,9 @@ public class Session implements Runnable
 		
 		if(left <= 0)
 		{
-			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "Oh! Sorry, you didnt get the word in time!"));
+			Unscramble.broadcast(ChatColor.DARK_AQUA + "Oh! Sorry, you didnt get the word in time!");
 			if(Unscramble.instance.getConfig().displayAnswer)
-				ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + "The answer was... " + ChatColor.RED + mWord));
+				Unscramble.broadcast(ChatColor.DARK_AQUA + "The answer was... " + ChatColor.RED + mWord);
 
 			mTask.cancel();
 			mTask = null;
@@ -207,7 +294,7 @@ public class Session implements Runnable
 		if(announce)
 		{
 			mLastAnnounce = System.currentTimeMillis();
-			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.DARK_AQUA + getTimeLeftString()));
+			Unscramble.broadcast(ChatColor.DARK_AQUA + getTimeLeftString(), true, false);
 		}
 		
 		if(mHintInterval != 0 && System.currentTimeMillis() - mLastHint >= mHintInterval)
@@ -216,7 +303,12 @@ public class Session implements Runnable
 			mLastHint = System.currentTimeMillis();
 		}
 	}
-	
+
+	private long getTimeRunning()
+	{
+		return System.currentTimeMillis() - mStartTime;
+	}
+
 	private long getTimeLeft()
 	{
 		return mEndTime - System.currentTimeMillis();
@@ -318,62 +410,26 @@ public class Session implements Runnable
 	}
 
 	public static int getWordDifficulty(String phrase) {
-		// Split the phrase into individual words
-		String[] words = phrase.split(" ");
+		String[] words = phrase.split("\\s+");
+		double adjustedScore = 0;
 
-		// Calculate the number of words
-		int wordCount = words.length;
-
-		// Calculate the average word length
-		int totalLength = 0;
 		for (String word : words) {
-			totalLength += word.length();
+			for (char c : word.toLowerCase().toCharArray()) {
+				if (scrabbleValues.containsKey(c)) {
+					int letterScore = scrabbleValues.get(c);
+					if (commonWords.contains(word.toLowerCase())) {
+						letterScore *= 0.3; // Common english words are only worth 30% of their value
+					}
+					else if (minecraftWords.contains(word.toLowerCase())) {
+						letterScore *= 0.7; // Common minecraft words are only worth 70% of their value
+					}
+					adjustedScore += letterScore;
+				}
+			}
 		}
-		int averageLength = (int) Math.round((double) totalLength / wordCount);
-
-		// Calculate the complexity for each word
-		int totalComplexity = 0;
-		List<Integer> wordScores = new ArrayList<>();
-		for (String word : words) {
-			int wordComplexity = calculateWordComplexity(word);
-			totalComplexity += wordComplexity;
-			wordScores.add(wordComplexity);
-		}
-
-		ProxyServer.getInstance().getLogger().info("[Unscramble] Difficulty: " + phrase
-				+ " = " + totalComplexity
-				+ " (" + Joiner.on("+").join(wordScores) + ")");
-		return totalComplexity;
-	}
-
-	private static int calculateWordComplexity(String word) {
-		// Create a set of common English words
-		Set<String> commonWords = new HashSet<>(Arrays.asList(
-				// Add more common words as needed
-				"a", "an", "the", "is", "are", "was", "were", "and", "or", "but",
-				"if", "then", "that", "this", "it", "of", "on", "in", "at", "to",
-				"with", "for", "from", "by", "about", "as", "into", "like", "through",
-				"after", "over", "between", "out", "up", "down", "all", "no", "not",
-				"some", "more", "most", "few", "fewer", "many", "much", "any", "every",
-				"other", "such", "only", "just", "also", "very", "really", "even", "well",
-				"now", "then", "there", "here", "how", "where", "when", "why", "what", "which"
-		));
-
-		// Count the number of unique characters in the word
-		Set<Character> uniqueCharacters = new HashSet<>();
-		for (int i = 0; i < word.length(); i++) {
-			uniqueCharacters.add(word.charAt(i));
-		}
-
-		// Calculate the complexity based on the number of unique characters
-		int complexity = uniqueCharacters.size();
-
-		// Reduce complexity for common English words
-		if (commonWords.contains(word.toLowerCase())) {
-			complexity = (int) Math.max(1, complexity - 1);
-		}
-
-		return complexity;
+		int result = (int) Math.round(adjustedScore);
+		Unscramble.logMsg("Difficulty: " + phrase + " = " + result);
+		return result;
 	}
 
 	public int getPointsForDifficulty(int difficulty) {
@@ -394,7 +450,7 @@ public class Session implements Runnable
 			points = val;
 			selected = entry;
 		}
-		ProxyServer.getInstance().getLogger().info("[Unscramble] Points: " + points + " (" + selected + ")");
+		Unscramble.logMsg("Points: " + points + " (" + selected + ")");
 		return points;
 	}
 

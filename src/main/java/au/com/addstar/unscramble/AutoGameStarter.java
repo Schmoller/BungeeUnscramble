@@ -25,14 +25,21 @@ class AutoGameStarter implements Runnable
 	@Override
 	public void run()
 	{
+		ProxyServer.getInstance().getScheduler().schedule(Unscramble.instance, () -> {
+			// Ensure the next game is always scheduled
+			Unscramble.debugMsg("Scheduling next game...");
+			Unscramble.instance.scheduleNextGame();
+		}, 5, TimeUnit.SECONDS);
+
 		if(!canRun())
 			return;
-		
-		if(mWarning == 0)
+
+		if(mWarning == 0) {
+			Unscramble.debugMsg("Starting auto game...");
 			Unscramble.instance.startAutoGame();
-		else
-		{
-			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(ChatColor.GREEN + "[Unscramble] " + ChatColor.YELLOW + "A game of unscramble is about to start!"));
+		} else {
+			Unscramble.debugMsg("Broadcasting game start...");
+			Unscramble.broadcast(ChatColor.YELLOW + "A game of unscramble is about to start!");
 			ProxyServer.getInstance().getScheduler().schedule(Unscramble.instance, () -> {
                 if(!canRun())
                     return;

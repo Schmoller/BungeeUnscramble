@@ -36,69 +36,68 @@ public class UnscrambleCommand extends Command
 	@Override
 	public void execute( CommandSender sender, String[] args )
 	{
-		if(args.length == 0)
+		if(args.length == 0 || args[0].equalsIgnoreCase("help"))
 		{
-			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.DARK_PURPLE + "====================================================="));
-			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + " Welcome to " + ChatColor.RED + "Unscramble " + ChatColor.GREEN + "Plugin " + ChatColor.BLUE + "(" + Unscramble.instance.getDescription().getVersion() + ")"));
-			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + " Help is available with " + ChatColor.GOLD + "/unscramble help"));
-			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.DARK_PURPLE + "====================================================="));
+			commandHelp(sender);
+		}
+		else if(args[0].equalsIgnoreCase("claim"))
+		{
+			commandClaim(sender);
+		}
+		else if(args[0].equalsIgnoreCase("stats") || args[0].equalsIgnoreCase("points"))
+		{
+			commandStats(sender);
+		}
+		else if(args[0].equalsIgnoreCase("reload"))
+		{
+			if(!permTest(sender, "unscramble.reload"))
+				return;
+
+			commandReload(sender);
+		}
+		else if(args[0].equalsIgnoreCase("hint"))
+		{
+			if(!permTest(sender, "unscramble.hint"))
+				return;
+
+			commandHint(sender);
+		}
+		else if(args[0].equalsIgnoreCase("cancel"))
+		{
+			if(!permTest(sender, "unscramble.cancel"))
+				return;
+
+			commandCancel(sender);
+		}
+		else if(args[0].equalsIgnoreCase("newgame"))
+		{
+			if(!permTest(sender, "unscramble.newgame"))
+				return;
+
+			commandNewgame(sender, Arrays.copyOfRange(args, 1, args.length));
+		}
+		else if(args[0].equalsIgnoreCase("debug"))
+		{
+			if(!permTest(sender, "unscramble.debug"))
+				return;
+
+			Unscramble.setDebug(!Unscramble.getDebug());
+			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "Debug mode is now " + (Unscramble.getDebug() ? "enabled" : "disabled")));
 		}
 		else
 		{
-			if(args[0].equalsIgnoreCase("help"))
-			{
-				commandHelp(sender);
-			}
-			else if(args[0].equalsIgnoreCase("claim"))
-			{
-				commandClaim(sender);
-			}
-			else if(args[0].equalsIgnoreCase("stats"))
-			{
-				commandStats(sender);
-			}
-			else if(args[0].equalsIgnoreCase("reload"))
-			{
-				if(!permTest(sender, "unscramble.reload"))
-					return;
-				
-				commandReload(sender);
-			}
-			else if(args[0].equalsIgnoreCase("hint"))
-			{
-				if(!permTest(sender, "unscramble.hint"))
-					return;
-				
-				commandHint(sender);
-			}
-			else if(args[0].equalsIgnoreCase("cancel"))
-			{
-				if(!permTest(sender, "unscramble.cancel"))
-					return;
-				
-				commandCancel(sender);
-			}
-			else if(args[0].equalsIgnoreCase("newgame"))
-			{
-				if(!permTest(sender, "unscramble.newgame"))
-					return;
-				
-				commandNewgame(sender, Arrays.copyOfRange(args, 1, args.length));
-			}
-			else
-			{
-				sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Unknown command /unscramble " + args[0]));
-			}
+			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Unknown command /unscramble " + args[0]));
 		}
 	}
 	
 	private void commandHelp(CommandSender sender)
 	{
 		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.DARK_PURPLE + "=================" + ChatColor.RED + " [ Unscramble Help ] " + ChatColor.DARK_PURPLE + "=================="));
-		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.YELLOW + "- States the general info"));
-		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "claim " + ChatColor.YELLOW + "- Claims any prizes you have won"));
 		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "help " + ChatColor.YELLOW + "- Shows this screen"));
-		
+		sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "stats " + ChatColor.YELLOW + "- Show your unscramble stats"));
+		if(sender.hasPermission("unscramble.claim"))
+			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "claim " + ChatColor.YELLOW + "- Claims any prizes you have won"));
+
 		if(sender.hasPermission("unscramble.reload"))
 			sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "/unscramble " + ChatColor.GRAY + "reload " + ChatColor.YELLOW + "- Reloads the config"));
 		
@@ -200,9 +199,9 @@ public class UnscrambleCommand extends Command
 		DatabaseManager dbm = Unscramble.instance.getDatabaseManager();
 		DatabaseManager.PlayerRecord rec = dbm.getRecord(uuid);
 		sender.sendMessage(ChatColor.YELLOW + "Unscramble stats for " + player.getDisplayName() + ":");
-		sender.sendMessage(ChatColor.GREEN + "> Point Balance: " + ChatColor.AQUA + rec.getPoints());
-		sender.sendMessage(ChatColor.GREEN + "> Total Wins: " + ChatColor.AQUA + rec.getWins());
-		sender.sendMessage(ChatColor.GREEN + "> Total Points: " + ChatColor.AQUA + rec.getTotalPoints());
+		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&d&l► &aTotal Wins: &b" + rec.getWins()));
+		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&d&l► &aTotal Points Earned: &b" + rec.getTotalPoints()));
+		sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&d&l► &6Point Balance: &b" + rec.getPoints()));
 	}
 
 	private void commandReload(CommandSender sender)

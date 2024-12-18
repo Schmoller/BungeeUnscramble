@@ -3,13 +3,13 @@ auto-game-enabled: true
 prize-expiration-days: 21
 expiring-prize-warning-days: 5
 points-table:
-  - "0:1"
-  - "12:2"
-  - "19:2"
-  - "23:3"
-  - "28:4"
-  - "33:5"
-db-url: "jdbc:mysql://localhost:3306/db_name"
+- 0:1
+- '12:2'
+- '19:2'
+- '23:3'
+- '28:4'
+- '33:5'
+db-url: jdbc:mysql://localhost:3306/db_name
 db-username: user
 db-password: pass
 claim-servers:
@@ -537,3 +537,5 @@ random-words:
 - zombie horse
 - zombie pigman
 - zombie villager
+claim-message: '&dUse your points to get rewards at &b/rewards'
+debug: false
